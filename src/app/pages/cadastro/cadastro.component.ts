@@ -171,6 +171,13 @@ export class CadastroComponent {
 
   private tratarErro(erro: unknown): void {
     const problema = extrairProblema(erro);
+    if (problema.codigo === 'EMAIL_DESCARTAVEL') {
+      const controleEmail = this.form.controls.email;
+      controleEmail.setErrors({ servidor: problema.mensagem ?? 'Use um e-mail permanente.' });
+      controleEmail.markAsTouched();
+      return;
+    }
+
     const camposNaoMapeados: string[] = [];
 
     for (const erroCampo of problema.erros) {

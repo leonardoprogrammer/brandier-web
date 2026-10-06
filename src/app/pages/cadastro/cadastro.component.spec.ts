@@ -183,6 +183,28 @@ describe('CadastroComponent', () => {
     expect(elemento().querySelector('h1')?.textContent).toContain('Criar conta');
   });
 
+  it('mostra no campo de e-mail a recusa de e-mail descartável', () => {
+    auth.cadastrar.and.returnValue(
+      throwError(
+        () =>
+          new HttpErrorResponse({
+            status: 400,
+            error: {
+              codigo: 'EMAIL_DESCARTAVEL',
+              detail: 'E-mails temporários ou descartáveis não são aceitos. Use um e-mail permanente.',
+            },
+          }),
+      ),
+    );
+    preencherCorretamente();
+
+    enviar();
+
+    expect(elemento().querySelector('#email-erro')?.textContent).toContain('E-mails temporários ou descartáveis');
+    expect(elemento().querySelector('h1')?.textContent).toContain('Criar conta');
+    expect(elemento().querySelector('#email')?.getAttribute('aria-invalid')).toBe('true');
+  });
+
   it('mostra erro geral quando a API está indisponível', () => {
     auth.cadastrar.and.returnValue(throwError(() => new HttpErrorResponse({ status: 0 })));
     preencherCorretamente();
