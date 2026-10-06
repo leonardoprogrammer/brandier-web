@@ -9,6 +9,7 @@ export interface NovoCadastro {
   email: string;
   senha: string;
   aceitouTermos: boolean;
+  turnstileToken?: string;
 }
 
 export interface MensagemResposta {

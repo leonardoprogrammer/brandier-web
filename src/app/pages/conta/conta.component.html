@@ -1,0 +1,80 @@
+<header>
+  <h1 class="text-2xl font-bold tracking-tight text-slate-900">Minha conta</h1>
+  <p class="mt-1 text-slate-600">Os dados da sua conta no Brandier.</p>
+</header>
+
+<section class="mt-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200" aria-labelledby="titulo-dados">
+  <h2 id="titulo-dados" class="text-lg font-semibold text-slate-900">Seus dados</h2>
+  <dl class="mt-3 grid gap-3 text-sm sm:grid-cols-2">
+    <div>
+      <dt class="text-slate-500">Nome</dt>
+      <dd class="font-medium text-slate-900" data-testid="nome">{{ usuario()?.nome }}</dd>
+    </div>
+    <div>
+      <dt class="text-slate-500">E-mail</dt>
+      <dd class="font-medium text-slate-900" data-testid="email">{{ usuario()?.email }}</dd>
+    </div>
+  </dl>
+</section>
+
+<section class="mt-6 rounded-2xl border border-red-200 bg-white p-6" aria-labelledby="titulo-exclusao">
+  <h2 id="titulo-exclusao" class="text-lg font-semibold text-red-800">Excluir conta</h2>
+  <p class="mt-2 text-sm text-slate-700">
+    Ao excluir a conta, apagamos os seus dados e também:
+  </p>
+  <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+    <li>as <strong>marcas que você gerencia</strong>, com as lojas, os produtos, os promotores, os convites e todas as reposições delas (os promotores perdem o acesso a essas marcas);</li>
+    <li>as reposições que você registrou como promotor em marcas de outros gestores;</li>
+    <li>os convites pendentes enviados para o seu e-mail.</li>
+  </ul>
+  <p class="mt-2 text-sm font-medium text-red-800">Esta ação é irreversível.</p>
+
+  @if (!confirmando()) {
+    <button type="button" class="mt-4 inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2" (click)="abrirConfirmacao()">
+      Excluir minha conta
+    </button>
+  } @else {
+    <form class="mt-4 space-y-4 rounded-lg border border-red-200 bg-red-50 p-4" (submit)="excluir($event)" novalidate role="alertdialog" aria-label="Confirmar exclusão da conta">
+      <div>
+        <label for="senha-exclusao" class="campo-rotulo">Digite sua senha para confirmar</label>
+        <input
+          id="senha-exclusao"
+          type="password"
+          class="campo-entrada"
+          autocomplete="current-password"
+          [formControl]="senha"
+          [attr.aria-invalid]="mensagemDaSenha() ? 'true' : null"
+          [attr.aria-describedby]="mensagemDaSenha() ? 'senha-exclusao-erro' : null"
+        />
+        @if (mensagemDaSenha(); as mensagem) {
+          <p id="senha-exclusao-erro" class="campo-erro" role="alert">{{ mensagem }}</p>
+        }
+      </div>
+
+      <div>
+        <label class="flex items-start gap-2 text-sm text-slate-800">
+          <input type="checkbox" class="mt-1 h-4 w-4 rounded border-slate-300" [formControl]="entendi" />
+          <span>Entendo que a exclusão é definitiva e apaga as minhas marcas e reposições.</span>
+        </label>
+        @if (mensagemDoAviso(); as mensagem) {
+          <p class="campo-erro" role="alert">{{ mensagem }}</p>
+        }
+      </div>
+
+      @if (erro(); as mensagem) {
+        <p class="aviso aviso-erro" role="alert">{{ mensagem }}</p>
+      }
+
+      <div class="flex flex-wrap gap-3">
+        <button
+          type="submit"
+          class="inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+          [disabled]="excluindo()"
+        >
+          {{ excluindo() ? 'Excluindo...' : 'Excluir definitivamente' }}
+        </button>
+        <button type="button" class="botao-secundario" [disabled]="excluindo()" (click)="cancelar()">Cancelar</button>
+      </div>
+    </form>
+  }
+</section>

@@ -3,7 +3,9 @@ import { ComponentFixture, TestBed, discardPeriodicTasks, fakeAsync, tick } from
 import { provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 
+import { CHAVE_DO_TURNSTILE } from '../../core/turnstile';
 import { AuthService } from '../../services/auth.service';
+import { ApiDoTurnstile, OpcoesDoTurnstile, TurnstileScriptService } from '../../services/turnstile-script.service';
 import { CadastroComponent } from './cadastro.component';
 
 describe('CadastroComponent', () => {
@@ -221,5 +223,169 @@ describe('CadastroComponent', () => {
     enviar();
 
     expect(elemento().querySelector('[role="alert"]')?.textContent).toContain('Não foi possível conectar');
+  });
+});
+
+describe('CadastroComponent com Turnstile', () => {
+  let fixture: ComponentFixture<CadastroComponent>;
+  let auth: jasmine.SpyObj<AuthService>;
+  let scriptService: jasmine.SpyObj<TurnstileScriptService>;
+  let api: jasmine.SpyObj<ApiDoTurnstile>;
+  let opcoes: OpcoesDoTurnstile;
+
+  async function montar(chave: string): Promise<void> {
+    auth = jasmine.createSpyObj<AuthService>('AuthService', ['cadastrar', 'reenviarVerificacao']);
+    api = jasmine.createSpyObj<ApiDoTurnstile>('ApiDoTurnstile', ['render', 'reset', 'remove']);
+    api.render.and.callFake((_elemento, recebidas) => {
+      opcoes = recebidas;
+      return 'widget';
+    });
+    scriptService = jasmine.createSpyObj<TurnstileScriptService>('TurnstileScriptService', ['carregar']);
+    scriptService.carregar.and.resolveTo(api);
+    await TestBed.configureTestingModule({
+      imports: [CadastroComponent],
+      providers: [
+        provideRouter([]),
+        { provide: AuthService, useValue: auth },
+        { provide: CHAVE_DO_TURNSTILE, useValue: chave },
+        { provide: TurnstileScriptService, useValue: scriptService },
+      ],
+    }).compileComponents();
+    fixture = TestBed.createComponent(CadastroComponent);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+  }
+
+  const elemento = (): HTMLElement => fixture.nativeElement as HTMLElement;
+
+  function preencher(): void {
+    const digitar = (id: string, valor: string): void => {
+      const campo = elemento().querySelector<HTMLInputElement>(`#${id}`)!;
+      campo.value = valor;
+      campo.dispatchEvent(new Event('input'));
+    };
+    digitar('nome', 'Pessoa Teste');
+    digitar('email', 'pessoa@exemplo.com');
+    digitar('senha', 'Senha1234');
+    digitar('confirmarSenha', 'Senha1234');
+    const termos = elemento().querySelector<HTMLInputElement>('#aceitouTermos')!;
+    termos.checked = true;
+    termos.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+  }
+
+  function enviar(): void {
+    elemento().querySelector<HTMLFormElement>('form')!.dispatchEvent(new Event('submit'));
+    fixture.detectChanges();
+  }
+
+  it('sem chave configurada não mostra o widget e envia sem token', async () => {
+    await montar('');
+    auth.cadastrar.and.returnValue(of({ message: 'ok' }));
+    preencher();
+
+    enviar();
+
+    expect(elemento().querySelector('app-turnstile')).toBeNull();
+    expect(scriptService.carregar).not.toHaveBeenCalled();
+    expect(auth.cadastrar.calls.mostRecent().args[0].turnstileToken).toBeUndefined();
+  });
+
+  it('com chave configurada mostra o widget usando a chave pública', async () => {
+    await montar('chave-publica');
+
+    expect(elemento().querySelector('app-turnstile')).not.toBeNull();
+    expect(opcoes.sitekey).toBe('chave-publica');
+  });
+
+  it('não envia sem passar na verificação e avisa o usuário', async () => {
+    await montar('chave-publica');
+    preencher();
+
+    enviar();
+
+    expect(auth.cadastrar).not.toHaveBeenCalled();
+    expect(elemento().querySelector('[data-testid="turnstile-pendente"]')?.textContent).toContain('Confirme a verificação de segurança');
+  });
+
+  it('avisa da verificação também quando o formulário está inválido e ainda sem token', async () => {
+    await montar('chave-publica');
+
+    enviar();
+
+    expect(auth.cadastrar).not.toHaveBeenCalled();
+    expect(elemento().querySelector('[data-testid="turnstile-pendente"]')).not.toBeNull();
+  });
+
+  it('envia o token do widget junto com os dados do cadastro', async () => {
+    await montar('chave-publica');
+    auth.cadastrar.and.returnValue(of({ message: 'ok' }));
+    preencher();
+    opcoes.callback('token-do-widget');
+    fixture.detectChanges();
+
+    enviar();
+
+    expect(auth.cadastrar).toHaveBeenCalledOnceWith({
+      nome: 'Pessoa Teste',
+      email: 'pessoa@exemplo.com',
+      senha: 'Senha1234',
+      aceitouTermos: true,
+      turnstileToken: 'token-do-widget',
+    });
+  });
+
+  it('o aviso some depois de passar na verificação', async () => {
+    await montar('chave-publica');
+    preencher();
+    enviar();
+    expect(elemento().querySelector('[data-testid="turnstile-pendente"]')).not.toBeNull();
+
+    opcoes.callback('token');
+    fixture.detectChanges();
+
+    expect(elemento().querySelector('[data-testid="turnstile-pendente"]')).toBeNull();
+  });
+
+  it('token que expira volta a exigir a verificação', async () => {
+    await montar('chave-publica');
+    preencher();
+    opcoes.callback('token');
+    opcoes['expired-callback']();
+    fixture.detectChanges();
+
+    enviar();
+
+    expect(auth.cadastrar).not.toHaveBeenCalled();
+  });
+
+  it('reinicia o widget quando o servidor recusa, pois o token é de uso único', async () => {
+    await montar('chave-publica');
+    auth.cadastrar.and.returnValue(
+      throwError(() => new HttpErrorResponse({ status: 400, error: { codigo: 'CAPTCHA_INVALIDO', detail: 'Não foi possível validar a verificação de segurança. Tente novamente.' } })),
+    );
+    preencher();
+    opcoes.callback('token-ruim');
+    fixture.detectChanges();
+
+    enviar();
+
+    expect(api.reset).toHaveBeenCalledOnceWith('widget');
+    expect(elemento().querySelector('[role="alert"]')?.textContent).toContain('verificação de segurança');
+    enviar();
+    expect(auth.cadastrar).toHaveBeenCalledTimes(1);
+  });
+
+  it('mostra a mensagem quando o teto global de contas foi atingido', async () => {
+    await montar('');
+    auth.cadastrar.and.returnValue(
+      throwError(() => new HttpErrorResponse({ status: 409, error: { codigo: 'LIMITE_CONTAS_ATINGIDO', detail: 'O limite de contas desta demonstração foi atingido. Tente novamente mais tarde.' } })),
+    );
+    preencher();
+
+    enviar();
+
+    expect(elemento().querySelector('[role="alert"]')?.textContent).toContain('limite de contas desta demonstração');
   });
 });

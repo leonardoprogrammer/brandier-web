@@ -1,12 +1,14 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { AuthLayoutComponent } from '../../components/auth-layout/auth-layout.component';
+import { TurnstileComponent } from '../../components/turnstile/turnstile.component';
 import { SenhaRequisitosComponent } from '../../components/senha-requisitos/senha-requisitos.component';
 import { extrairProblema, mensagemDeErro } from '../../core/api-error';
+import { CHAVE_DO_TURNSTILE } from '../../core/turnstile';
 import { AuthService } from '../../services/auth.service';
 import {
   SENHA_TAMANHO_MAXIMO,
@@ -22,12 +24,13 @@ const SEGUNDOS_ENTRE_REENVIOS = 60;
 
 @Component({
   selector: 'app-cadastro',
-  imports: [ReactiveFormsModule, RouterLink, AuthLayoutComponent, SenhaRequisitosComponent],
+  imports: [ReactiveFormsModule, RouterLink, AuthLayoutComponent, SenhaRequisitosComponent, TurnstileComponent],
   templateUrl: './cadastro.component.html',
 })
 export class CadastroComponent {
   private readonly formBuilder = inject(NonNullableFormBuilder);
   private readonly auth = inject(AuthService);
+  private readonly turnstile = viewChild(TurnstileComponent);
   private temporizador: ReturnType<typeof setInterval> | null = null;
 
   protected readonly form = this.formBuilder.group(
@@ -50,6 +53,11 @@ export class CadastroComponent {
     { validators: senhasIguais('senha', 'confirmarSenha') },
   );
 
+  protected readonly chaveTurnstile = inject(CHAVE_DO_TURNSTILE);
+  protected readonly turnstileAtivo = this.chaveTurnstile !== '';
+  protected readonly tokenTurnstile = signal<string | null>(null);
+  protected readonly turnstilePendente = signal(false);
+
   protected readonly senhaDigitada = toSignal(this.form.controls.senha.valueChanges, { initialValue: '' });
 
   protected readonly enviando = signal(false);
@@ -68,16 +76,29 @@ export class CadastroComponent {
   protected cadastrar(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.turnstilePendente.set(this.turnstileAtivo && this.tokenTurnstile() === null);
       return;
     }
 
+    if (this.turnstileAtivo && this.tokenTurnstile() === null) {
+      this.turnstilePendente.set(true);
+      return;
+    }
+
+    this.turnstilePendente.set(false);
     this.enviando.set(true);
     this.erro.set(null);
 
     const { nome, email, senha, aceitouTermos } = this.form.getRawValue();
     const emailInformado = email.trim();
     this.auth
-      .cadastrar({ nome: nome.trim(), email: emailInformado, senha, aceitouTermos })
+      .cadastrar({
+        nome: nome.trim(),
+        email: emailInformado,
+        senha,
+        aceitouTermos,
+        ...(this.tokenTurnstile() ? { turnstileToken: this.tokenTurnstile() as string } : {}),
+      })
       .pipe(finalize(() => this.enviando.set(false)))
       .subscribe({
         next: () => {
@@ -162,6 +183,7 @@ export class CadastroComponent {
   }
 
   private tratarErro(erro: unknown): void {
+    this.turnstile()?.reiniciar();
     const problema = extrairProblema(erro);
     if (problema.codigo === 'EMAIL_DESCARTAVEL') {
       const controleEmail = this.form.controls.email;

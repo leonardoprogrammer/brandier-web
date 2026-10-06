@@ -142,6 +142,15 @@
         }
       </div>
 
+      @if (turnstileAtivo) {
+        <div>
+          <app-turnstile [siteKey]="chaveTurnstile" (token)="tokenTurnstile.set($event)" />
+          @if (turnstilePendente() && !tokenTurnstile()) {
+            <p class="campo-erro" role="alert" data-testid="turnstile-pendente">Confirme a verificação de segurança para continuar.</p>
+          }
+        </div>
+      }
+
       <button type="submit" class="botao-primario" [disabled]="enviando()">
         {{ enviando() ? 'Criando conta...' : 'Criar conta' }}
       </button>

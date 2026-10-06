@@ -1,0 +1,73 @@
+<article class="space-y-10">
+  <header>
+    <h1 class="text-3xl font-bold tracking-tight text-slate-900">Como funciona</h1>
+    <p class="mt-3 text-lg text-slate-600">
+      O Brandier ajuda o gestor de uma marca a acompanhar o que os promotores repõem nas lojas.
+      <br>Veja o caminho completo e as respostas para as dúvidas mais comuns.
+    </p>
+  </header>
+
+  <section aria-labelledby="passo-a-passo">
+    <h2 id="passo-a-passo" class="text-xl font-semibold text-slate-900">Passo a passo</h2>
+    <ol class="mt-4 space-y-4" data-testid="passos">
+      @for (passo of passos; track passo.titulo; let i = $index) {
+        <li class="flex gap-4">
+          <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-sm font-bold text-white" aria-hidden="true">{{ i + 1 }}</span>
+          <div>
+            <h3 class="font-semibold text-slate-900">{{ passo.titulo }}</h3>
+            <p class="mt-1 text-slate-700">{{ passo.descricao }}</p>
+          </div>
+        </li>
+      }
+    </ol>
+  </section>
+
+  <section aria-labelledby="papeis">
+    <h2 id="papeis" class="text-xl font-semibold text-slate-900">Gestor e promotor</h2>
+    <div class="mt-3 space-y-3 text-slate-700">
+      <p>
+        Existe um único tipo de conta. <strong>Gestor</strong> e <strong>promotor</strong> são papéis em cada marca: quem
+        cria a marca é o gestor dela, e quem aceita o convite do gestor passa a ser promotor dela.
+      </p>
+      <ul class="list-disc space-y-1 pl-5">
+        <li>O <strong>gestor</strong> mantém lojas e produtos, convida promotores, vê tudo da marca e também pode registrar reposições.</li>
+        <li>O <strong>promotor</strong> registra reposições nas lojas da marca e acompanha as suas próprias.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section aria-labelledby="limites">
+    <h2 id="limites" class="text-xl font-semibold text-slate-900">Limites da demonstração</h2>
+    <ul class="mt-3 grid gap-2 text-slate-700 sm:grid-cols-2" data-testid="limites">
+      <li class="rounded-lg bg-slate-50 px-4 py-3">Até <strong>2 marcas</strong> por conta</li>
+      <li class="rounded-lg bg-slate-50 px-4 py-3">Até <strong>5 lojas</strong> por marca</li>
+      <li class="rounded-lg bg-slate-50 px-4 py-3">Até <strong>10 produtos</strong> por marca</li>
+      <li class="rounded-lg bg-slate-50 px-4 py-3">Até <strong>5 promotores</strong> por marca (convites pendentes contam)</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="edicao">
+    <h2 id="edicao" class="text-xl font-semibold text-slate-900">Edição de reposições</h2>
+    <p class="mt-3 text-slate-700">
+      O gestor edita e exclui qualquer reposição da marca, a qualquer momento. O promotor edita e exclui apenas as
+      próprias, em até <strong>24 horas</strong> depois do registro.
+    </p>
+  </section>
+
+  <section aria-labelledby="perguntas">
+    <h2 id="perguntas" class="text-xl font-semibold text-slate-900">Perguntas frequentes</h2>
+    <div class="mt-4 divide-y divide-slate-200 rounded-2xl bg-white ring-1 ring-slate-200" data-testid="perguntas">
+      @for (item of perguntas; track item.pergunta) {
+        <details class="group px-5 py-4">
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-medium text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600/50">
+            <span>{{ item.pergunta }}</span>
+            <svg class="h-5 w-5 shrink-0 text-slate-500 transition-transform group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+            </svg>
+          </summary>
+          <p class="mt-3 text-slate-700">{{ item.resposta }}</p>
+        </details>
+      }
+    </div>
+  </section>
+</article>

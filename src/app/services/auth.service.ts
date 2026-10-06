@@ -53,6 +53,12 @@ export class AuthService {
       .pipe(tap(() => this.usuarioAtual.set(null)));
   }
 
+  excluirConta(senha: string): Observable<void> {
+    return this.http
+      .post<void>(`${this.baseUrl}/excluir-conta`, { senha })
+      .pipe(tap(() => this.usuarioAtual.set(null)));
+  }
+
   sair(): Observable<MensagemResposta> {
     return this.http
       .post<MensagemResposta>(`${this.baseUrl}/logout`, null)

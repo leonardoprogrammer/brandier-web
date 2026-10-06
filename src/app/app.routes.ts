@@ -35,6 +35,11 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/sobre/sobre.component').then((m) => m.SobreComponent),
   },
   {
+    path: 'como-funciona',
+    title: 'Como funciona - Brandier',
+    loadComponent: () => import('./pages/como-funciona/como-funciona.component').then((m) => m.ComoFuncionaComponent),
+  },
+  {
     path: 'verificar-email',
     title: 'Verificar e-mail - Brandier',
     loadComponent: () =>
@@ -154,6 +159,19 @@ export const routes: Routes = [
         title: 'Como promotor - Brandier',
         loadComponent: () =>
           import('./pages/promotor-vinculos/promotor-vinculos.component').then((m) => m.PromotorVinculosComponent),
+      },
+      {
+        path: 'conta',
+        title: 'Minha conta - Brandier',
+        loadComponent: () => import('./pages/conta/conta.component').then((m) => m.ContaComponent),
+      },
+      {
+        path: 'como-funciona',
+        title: 'Como funciona - Brandier',
+        loadComponent: () =>
+          import('./components/como-funciona-conteudo/como-funciona-conteudo.component').then(
+            (m) => m.ComoFuncionaConteudoComponent,
+          ),
       },
       {
         path: 'sobre',

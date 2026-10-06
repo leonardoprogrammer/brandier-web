@@ -17,7 +17,10 @@ export class EntrarComponent {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
-  protected readonly sessaoExpirada = inject(ActivatedRoute).snapshot.queryParamMap.has('sessaoExpirada');
+  private readonly parametros = inject(ActivatedRoute).snapshot.queryParamMap;
+
+  protected readonly sessaoExpirada = this.parametros.has('sessaoExpirada');
+  protected readonly contaExcluida = this.parametros.has('contaExcluida');
 
   protected readonly form = this.formBuilder.group({
     email: ['', [Validators.required, Validators.email, Validators.maxLength(254)]],

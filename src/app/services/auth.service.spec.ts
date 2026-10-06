@@ -117,6 +117,30 @@ describe('AuthService', () => {
     expect(service.autenticado()).toBeTrue();
   });
 
+  it('excluirConta envia a senha em POST e encerra a sessão local', () => {
+    service.entrar('pessoa@exemplo.com', 'Senha1234').subscribe();
+    http.expectOne('/api/v1/usuario/login').flush(usuario);
+    expect(service.autenticado()).toBeTrue();
+
+    service.excluirConta('Senha1234').subscribe();
+
+    const requisicao = http.expectOne('/api/v1/usuario/excluir-conta');
+    expect(requisicao.request.method).toBe('POST');
+    expect(requisicao.request.body).toEqual({ senha: 'Senha1234' });
+    requisicao.flush(null, { status: 204, statusText: 'No Content' });
+    expect(service.autenticado()).toBeFalse();
+  });
+
+  it('excluirConta mantém a sessão local quando a senha está incorreta', () => {
+    service.entrar('pessoa@exemplo.com', 'Senha1234').subscribe();
+    http.expectOne('/api/v1/usuario/login').flush(usuario);
+
+    service.excluirConta('errada').subscribe({ error: () => undefined });
+    http.expectOne('/api/v1/usuario/excluir-conta').flush({ codigo: 'SENHA_INCORRETA' }, { status: 403, statusText: 'Forbidden' });
+
+    expect(service.autenticado()).toBeTrue();
+  });
+
   it('sair limpa o usuário mesmo quando a API falha', () => {
     service.entrar('pessoa@exemplo.com', 'Senha1234').subscribe();
     http.expectOne('/api/v1/usuario/login').flush(usuario);

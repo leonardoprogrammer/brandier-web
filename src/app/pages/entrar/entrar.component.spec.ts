@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router, provideRouter } from '@angular/router';
+import { ActivatedRoute, Router, convertToParamMap, provideRouter } from '@angular/router';
 import { Subject, of, throwError } from 'rxjs';
 
 import { Usuario } from '../../models/usuario.model';
@@ -153,5 +153,43 @@ describe('EntrarComponent', () => {
     fixture.detectChanges();
 
     expect(botao.disabled).toBeFalse();
+  });
+});
+
+describe('EntrarComponent com avisos pela URL', () => {
+  async function montar(parametros: Record<string, string>): Promise<HTMLElement> {
+    const auth = jasmine.createSpyObj<AuthService>('AuthService', ['entrar', 'reenviarVerificacao']);
+    await TestBed.configureTestingModule({
+      imports: [EntrarComponent],
+      providers: [
+        provideRouter([]),
+        { provide: AuthService, useValue: auth },
+        { provide: ActivatedRoute, useValue: { snapshot: { queryParamMap: convertToParamMap(parametros) } } },
+      ],
+    }).compileComponents();
+    const fixture = TestBed.createComponent(EntrarComponent);
+    fixture.detectChanges();
+    return fixture.nativeElement as HTMLElement;
+  }
+
+  it('mostra a confirmação quando a conta acabou de ser excluída', async () => {
+    const tela = await montar({ contaExcluida: 'true' });
+
+    expect(tela.querySelector('[data-testid="conta-excluida"]')?.textContent).toContain('Sua conta foi excluída');
+    expect(tela.textContent).not.toContain('Sua sessão expirou');
+  });
+
+  it('mostra o aviso de sessão expirada sem a confirmação de conta excluída', async () => {
+    const tela = await montar({ sessaoExpirada: 'true' });
+
+    expect(tela.textContent).toContain('Sua sessão expirou');
+    expect(tela.querySelector('[data-testid="conta-excluida"]')).toBeNull();
+  });
+
+  it('sem parâmetros não mostra nenhum aviso', async () => {
+    const tela = await montar({});
+
+    expect(tela.querySelector('[data-testid="conta-excluida"]')).toBeNull();
+    expect(tela.textContent).not.toContain('Sua sessão expirou');
   });
 });

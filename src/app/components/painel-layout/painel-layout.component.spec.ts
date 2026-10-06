@@ -42,6 +42,7 @@ describe('PainelLayoutComponent', () => {
               { path: 'relatorios', component: PaginaFalsaComponent },
               { path: 'promotor', component: PaginaFalsaComponent },
               { path: 'sobre', component: PaginaFalsaComponent },
+              { path: 'como-funciona', component: PaginaFalsaComponent },
             ],
           },
         ]),
@@ -165,6 +166,13 @@ describe('PainelLayoutComponent', () => {
       expect(ativos()).toEqual(['Sobre']);
     });
 
+    it('destaca "Como funciona" na sua página', async () => {
+      await irPara('/painel/como-funciona');
+
+      expect(ativos()).toEqual(['Como']);
+      expect(linkDo('/painel/como-funciona').getAttribute('aria-current')).toBe('page');
+    });
+
     it('troca o destaque ao navegar de uma página para outra', async () => {
       await irPara('/painel/marcas');
       await irPara('/painel/reposicoes');
@@ -176,8 +184,18 @@ describe('PainelLayoutComponent', () => {
     it('todos os links do menu usam a classe base de componente', () => {
       const links = elemento().querySelectorAll('nav[aria-label="Menu do painel"] a');
 
-      expect(links.length).toBe(6);
+      expect(links.length).toBe(7);
       links.forEach((link) => expect(link.classList).toContain('menu-link'));
+    });
+  });
+
+  describe('link da conta', () => {
+    it('mostra "Minha conta" no topo, ao lado de Sair', () => {
+      const link = elemento().querySelector<HTMLAnchorElement>('[data-testid="link-conta"]')!;
+
+      expect(link.getAttribute('href')).toBe('/painel/conta');
+      expect(link.textContent?.trim()).toBe('Minha conta');
+      expect(link.closest('header')).not.toBeNull();
     });
   });
 
