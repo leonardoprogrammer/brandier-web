@@ -1,0 +1,65 @@
+<div class="mx-auto max-w-xl">
+  <a routerLink="/painel/marcas" class="link-discreto text-sm">&larr; Voltar para marcas</a>
+
+  <h1 class="mt-3 text-2xl font-bold tracking-tight text-slate-900">{{ edicao ? 'Editar marca' : 'Nova marca' }}</h1>
+
+  @if (carregando()) {
+    <p class="mt-6 text-slate-500" role="status">Carregando...</p>
+  } @else if (naoEncontrada()) {
+    <div class="aviso aviso-erro mt-6 space-y-3" role="alert">
+      <p>Marca não encontrada.</p>
+      <a routerLink="/painel/marcas" class="botao-secundario">Voltar para marcas</a>
+    </div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="salvar()" novalidate class="mt-6 space-y-4 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+      @if (erro(); as mensagem) {
+        <div class="aviso aviso-erro space-y-2" role="alert">
+          <p>{{ mensagem }}</p>
+          @if (limiteAtingido()) {
+            <a routerLink="/painel/marcas" class="link-discreto">Ver minhas marcas</a>
+          }
+        </div>
+      }
+
+      <div>
+        <label for="nome" class="campo-rotulo">Nome da marca</label>
+        <input
+          id="nome"
+          type="text"
+          formControlName="nome"
+          class="campo-entrada"
+          [attr.aria-invalid]="mensagemDoCampo('nome') ? 'true' : null"
+          [attr.aria-describedby]="mensagemDoCampo('nome') ? 'nome-erro' : null"
+        />
+        @if (mensagemDoCampo('nome'); as mensagem) {
+          <p id="nome-erro" class="campo-erro" role="alert">{{ mensagem }}</p>
+        }
+      </div>
+
+      <div>
+        <label for="descricao" class="campo-rotulo">Descrição <span class="font-normal text-slate-500">(opcional)</span></label>
+        <textarea
+          id="descricao"
+          rows="4"
+          formControlName="descricao"
+          class="campo-entrada"
+          [attr.aria-invalid]="mensagemDoCampo('descricao') ? 'true' : null"
+          [attr.aria-describedby]="mensagemDoCampo('descricao') ? 'descricao-erro' : 'descricao-contador'"
+        ></textarea>
+        <p id="descricao-contador" class="mt-1 text-right text-xs text-slate-500">
+          {{ caracteresDaDescricao() }}/{{ descricaoTamanhoMaximo }}
+        </p>
+        @if (mensagemDoCampo('descricao'); as mensagem) {
+          <p id="descricao-erro" class="campo-erro" role="alert">{{ mensagem }}</p>
+        }
+      </div>
+
+      <div class="flex gap-3">
+        <button type="submit" class="botao-primario w-auto" [disabled]="enviando()">
+          {{ enviando() ? 'Salvando...' : edicao ? 'Salvar alterações' : 'Criar marca' }}
+        </button>
+        <a routerLink="/painel/marcas" class="botao-secundario">Cancelar</a>
+      </div>
+    </form>
+  }
+</div>

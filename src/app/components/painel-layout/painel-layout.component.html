@@ -1,0 +1,55 @@
+<div class="flex min-h-screen flex-col">
+  <header class="border-b border-slate-200 bg-white">
+    <div class="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3">
+      <a routerLink="/painel" class="flex items-center gap-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600/40" aria-label="Brandier, início do painel">
+        <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-lg font-bold text-white" aria-hidden="true">B</span>
+        <span class="text-xl font-bold tracking-tight text-slate-900">Brandier</span>
+      </a>
+
+      <div class="flex items-center gap-3">
+        <span class="hidden max-w-[16rem] truncate text-sm text-slate-600 sm:inline" data-testid="nome-usuario">{{ usuario()?.nome }}</span>
+        <button type="button" class="botao-secundario" [disabled]="saindo()" (click)="sair()">
+          {{ saindo() ? 'Saindo...' : 'Sair' }}
+        </button>
+      </div>
+    </div>
+
+    <nav class="border-t border-slate-100" aria-label="Menu do painel">
+      <ul class="mx-auto flex max-w-5xl gap-1 overflow-x-auto px-4 text-sm font-medium">
+        <li>
+          <a
+            routerLink="/painel"
+            routerLinkActive="border-indigo-600 text-indigo-700"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="inline-block whitespace-nowrap border-b-2 border-transparent px-3 py-3 text-slate-600 hover:text-slate-900"
+          >Início</a>
+        </li>
+        <li>
+          <a
+            routerLink="/painel/marcas"
+            routerLinkActive="border-indigo-600 text-indigo-700"
+            class="inline-block whitespace-nowrap border-b-2 border-transparent px-3 py-3 text-slate-600 hover:text-slate-900"
+          >Marcas</a>
+        </li>
+        <li>
+          <a
+            routerLink="/painel/sobre"
+            routerLinkActive="border-indigo-600 text-indigo-700"
+            class="inline-block whitespace-nowrap border-b-2 border-transparent px-3 py-3 text-slate-600 hover:text-slate-900"
+          >Sobre</a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
+    <router-outlet />
+  </main>
+
+  <footer class="border-t border-slate-200 bg-white">
+    <div class="mx-auto max-w-5xl px-4 py-4 text-center text-xs text-slate-500">
+      Projeto de portfólio, não é para uso comercial.
+      <a routerLink="/painel/sobre" class="link-discreto">Sobre o projeto</a>
+    </div>
+  </footer>
+</div>

@@ -26,7 +26,11 @@ A API fica no repositório `brandier-api`.
 | `/esqueci-senha` | Pede o link de redefinição de senha | Visitante |
 | `/redefinir-senha` | Define a nova senha pelo link recebido | Qualquer |
 | `/sobre` | Sobre o projeto, privacidade e contato | Público |
-| `/painel` | Painel (provisório, em construção) | Autenticado |
+| `/painel` | Início do painel, com o resumo de marcas | Autenticado |
+| `/painel/marcas` | Lista de marcas, uso do limite e exclusão | Autenticado |
+| `/painel/marcas/nova` | Cria uma marca | Autenticado |
+| `/painel/marcas/:id` | Edita uma marca | Autenticado |
+| `/painel/sobre` | Mesma página Sobre, dentro do painel | Autenticado |
 
 ## Estrutura do código
 
@@ -98,4 +102,4 @@ A aplicação sobe em `http://localhost:4200`. O arquivo `proxy.conf.json` encam
 npm test -- --watch=false --browsers=ChromeHeadless
 ```
 
-Cobrem validadores, leitura de erros da API, serviço de autenticação, interceptor, guards, as telas de autenticação e a página Sobre. O build de produção (`npm run build`) também compila os templates em modo estrito.
+Cobrem validadores, leitura de erros da API, serviço de autenticação, interceptor, guards, as telas de autenticação, a página Sobre, o layout do painel e as telas de marcas. O build de produção (`npm run build`) também compila os templates em modo estrito.

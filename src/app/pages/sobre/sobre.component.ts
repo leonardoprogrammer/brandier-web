@@ -1,13 +1,11 @@
 import { Component } from '@angular/core';
 
 import { PublicLayoutComponent } from '../../components/public-layout/public-layout.component';
-import { AUTOR } from '../../core/links-autor';
+import { SobreConteudoComponent } from '../../components/sobre-conteudo/sobre-conteudo.component';
 
 @Component({
   selector: 'app-sobre',
-  imports: [PublicLayoutComponent],
+  imports: [PublicLayoutComponent, SobreConteudoComponent],
   templateUrl: './sobre.component.html',
 })
-export class SobreComponent {
-  protected readonly autor = AUTOR;
-}
+export class SobreComponent {}

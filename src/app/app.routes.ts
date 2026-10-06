@@ -42,9 +42,40 @@ export const routes: Routes = [
   },
   {
     path: 'painel',
-    title: 'Painel - Brandier',
     canActivate: [authGuard],
-    loadComponent: () => import('./pages/painel/painel.component').then((m) => m.PainelComponent),
+    loadComponent: () =>
+      import('./components/painel-layout/painel-layout.component').then((m) => m.PainelLayoutComponent),
+    children: [
+      {
+        path: '',
+        title: 'Painel - Brandier',
+        loadComponent: () =>
+          import('./pages/painel-inicio/painel-inicio.component').then((m) => m.PainelInicioComponent),
+      },
+      {
+        path: 'marcas',
+        title: 'Marcas - Brandier',
+        loadComponent: () => import('./pages/marcas/marcas.component').then((m) => m.MarcasComponent),
+      },
+      {
+        path: 'marcas/nova',
+        title: 'Nova marca - Brandier',
+        loadComponent: () =>
+          import('./pages/marca-formulario/marca-formulario.component').then((m) => m.MarcaFormularioComponent),
+      },
+      {
+        path: 'marcas/:id',
+        title: 'Editar marca - Brandier',
+        loadComponent: () =>
+          import('./pages/marca-formulario/marca-formulario.component').then((m) => m.MarcaFormularioComponent),
+      },
+      {
+        path: 'sobre',
+        title: 'Sobre o projeto - Brandier',
+        loadComponent: () =>
+          import('./components/sobre-conteudo/sobre-conteudo.component').then((m) => m.SobreConteudoComponent),
+      },
+    ],
   },
   { path: '**', redirectTo: 'entrar' },
 ];

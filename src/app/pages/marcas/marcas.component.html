@@ -1,0 +1,80 @@
+<header class="flex flex-wrap items-start justify-between gap-4">
+  <div>
+    <h1 class="text-2xl font-bold tracking-tight text-slate-900">Marcas</h1>
+    <p class="mt-1 text-slate-600">As marcas que você gerencia.</p>
+  </div>
+
+  @if (!carregando() && !falhou()) {
+    <div class="flex items-center gap-3">
+      <span class="rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700" data-testid="uso-marcas">
+        {{ marcas().length }}/{{ limite() }} marcas
+      </span>
+      @if (atingiuLimite()) {
+        <button type="button" class="botao-primario w-auto" disabled aria-describedby="aviso-limite">Nova marca</button>
+      } @else {
+        <a routerLink="/painel/marcas/nova" class="botao-primario w-auto">Nova marca</a>
+      }
+    </div>
+  }
+</header>
+
+@if (!carregando() && !falhou() && atingiuLimite()) {
+  <p id="aviso-limite" class="aviso aviso-atencao mt-4" role="status">
+    Você atingiu o limite de {{ limite() }} marcas desta conta. Exclua uma marca para poder criar outra.
+  </p>
+}
+
+@if (erroExclusao(); as mensagem) {
+  <p class="aviso aviso-erro mt-4" role="alert">{{ mensagem }}</p>
+}
+
+<div class="mt-6">
+  @if (carregando()) {
+    <p class="text-slate-500" role="status">Carregando marcas...</p>
+  } @else if (falhou()) {
+    <div class="aviso aviso-erro space-y-3" role="alert">
+      <p>Não foi possível carregar suas marcas.</p>
+      <button type="button" class="botao-secundario" (click)="carregar()">Tentar de novo</button>
+    </div>
+  } @else if (marcas().length === 0) {
+    <div class="rounded-2xl border-2 border-dashed border-slate-300 bg-white p-10 text-center">
+      <h2 class="text-lg font-semibold text-slate-900">Você ainda não tem marcas</h2>
+      <p class="mt-2 text-slate-600">Crie a sua primeira marca para começar a cadastrar lojas e produtos.</p>
+      <a routerLink="/painel/marcas/nova" class="botao-primario mx-auto mt-5 w-auto">Criar primeira marca</a>
+    </div>
+  } @else {
+    <ul class="grid gap-4 sm:grid-cols-2">
+      @for (marca of marcas(); track marca.id) {
+        <li class="flex flex-col rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+          <h2 class="text-lg font-semibold text-slate-900">{{ marca.nome }}</h2>
+          <p class="mt-2 flex-1 text-sm text-slate-600">{{ marca.descricao ?? 'Sem descrição.' }}</p>
+          <p class="mt-3 text-xs text-slate-500">Criada em {{ formatarData(marca.criadoEm) }}</p>
+
+          @if (confirmandoExclusao() === marca.id) {
+            <div class="mt-4 space-y-3 rounded-lg border border-red-200 bg-red-50 p-3" role="alertdialog" [attr.aria-label]="'Confirmar exclusão da marca ' + marca.nome">
+              <p class="text-sm text-red-800">
+                Excluir a marca <strong>{{ marca.nome }}</strong>? Essa ação não pode ser desfeita.
+              </p>
+              <div class="flex gap-2">
+                <button type="button" class="botao-secundario" [disabled]="excluindo() === marca.id" (click)="cancelarExclusao()">Cancelar</button>
+                <button
+                  type="button"
+                  class="inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+                  [disabled]="excluindo() === marca.id"
+                  (click)="excluir(marca)"
+                >
+                  {{ excluindo() === marca.id ? 'Excluindo...' : 'Excluir' }}
+                </button>
+              </div>
+            </div>
+          } @else {
+            <div class="mt-4 flex gap-2">
+              <a [routerLink]="['/painel/marcas', marca.id]" class="botao-secundario">Editar</a>
+              <button type="button" class="botao-secundario text-red-700" (click)="pedirConfirmacao(marca.id)">Excluir</button>
+            </div>
+          }
+        </li>
+      }
+    </ul>
+  }
+</div>

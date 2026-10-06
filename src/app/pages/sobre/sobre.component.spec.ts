@@ -21,8 +21,8 @@ describe('SobreComponent', () => {
 
   it('apresenta o projeto e deixa claro que é de portfólio e não comercial', () => {
     expect(elemento().querySelector('h1')?.textContent).toContain('Sobre o projeto');
+    expect(elemento().textContent).toContain('Um projeto de portfólio');
     expect(elemento().textContent).toContain('A aplicação que está no ar não é para uso comercial.');
-    expect(elemento().textContent).toContain('código-fonte é livre');
   });
 
   it('lista os dados guardados e o prazo de limpeza de contas não verificadas', () => {
