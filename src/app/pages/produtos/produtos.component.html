@@ -1,0 +1,100 @@
+<a routerLink="/painel/marcas" class="link-discreto text-sm">&larr; Voltar para marcas</a>
+
+@if (naoEncontrada()) {
+  <div class="aviso aviso-erro mt-6 space-y-3" role="alert">
+    <p>Marca não encontrada.</p>
+    <a routerLink="/painel/marcas" class="botao-secundario">Voltar para marcas</a>
+  </div>
+} @else {
+  <header class="mt-3 flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900">Produtos</h1>
+      <p class="mt-1 text-slate-600">
+        @if (marcaNome()) {
+          Catálogo da marca <strong>{{ marcaNome() }}</strong>.
+        } @else {
+          Catálogo da marca.
+        }
+      </p>
+    </div>
+
+    @if (!carregando() && !falhou()) {
+      <div class="flex items-center gap-3">
+        <span class="rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700" data-testid="uso-produtos">
+          {{ produtos().length }}/{{ limite() }} produtos
+        </span>
+        @if (atingiuLimite()) {
+          <button type="button" class="botao-primario w-auto" disabled aria-describedby="aviso-limite">Novo produto</button>
+        } @else {
+          <a [routerLink]="['/painel/marcas', marcaId, 'produtos', 'novo']" class="botao-primario w-auto">Novo produto</a>
+        }
+      </div>
+    }
+  </header>
+
+  @if (!carregando() && !falhou() && atingiuLimite()) {
+    <p id="aviso-limite" class="aviso aviso-atencao mt-4" role="status">
+      Esta marca atingiu o limite de {{ limite() }} produtos. Exclua um produto para poder criar outro.
+    </p>
+  }
+
+  @if (erroExclusao(); as mensagem) {
+    <p class="aviso aviso-erro mt-4" role="alert">{{ mensagem }}</p>
+  }
+
+  <div class="mt-6">
+    @if (carregando()) {
+      <p class="text-slate-500" role="status">Carregando produtos...</p>
+    } @else if (falhou()) {
+      <div class="aviso aviso-erro space-y-3" role="alert">
+        <p>Não foi possível carregar os produtos.</p>
+        <button type="button" class="botao-secundario" (click)="carregar()">Tentar de novo</button>
+      </div>
+    } @else if (produtos().length === 0) {
+      <div class="rounded-2xl border-2 border-dashed border-slate-300 bg-white p-10 text-center">
+        <h2 class="text-lg font-semibold text-slate-900">Esta marca ainda não tem produtos</h2>
+        <p class="mt-2 text-slate-600">Monte o catálogo que os promotores vão usar ao registrar reposições.</p>
+        <a [routerLink]="['/painel/marcas', marcaId, 'produtos', 'novo']" class="botao-primario mx-auto mt-5 w-auto">Cadastrar primeiro produto</a>
+      </div>
+    } @else {
+      <ul class="grid gap-4 sm:grid-cols-2">
+        @for (produto of produtos(); track produto.id) {
+          <li class="flex flex-col rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+            <h2 class="text-lg font-semibold text-slate-900">{{ produto.nome }}</h2>
+            <p class="mt-2 flex-1 text-sm text-slate-600">
+              @if (produto.codigo) {
+                Código: {{ produto.codigo }}
+              } @else {
+                Sem código.
+              }
+            </p>
+
+            @if (confirmandoExclusao() === produto.id) {
+              <div class="mt-4 space-y-3 rounded-lg border border-red-200 bg-red-50 p-3" role="alertdialog" [attr.aria-label]="'Confirmar exclusão do produto ' + produto.nome">
+                <p class="text-sm text-red-800">
+                  Excluir o produto <strong>{{ produto.nome }}</strong>? Essa ação não pode ser desfeita.
+                </p>
+                <div class="flex gap-2">
+                  <button type="button" class="botao-secundario" [disabled]="excluindo() === produto.id" (click)="cancelarExclusao()">Cancelar</button>
+                  <button
+                    type="button"
+                    class="inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+                    [disabled]="excluindo() === produto.id"
+                    (click)="excluir(produto)"
+                  >
+                    {{ excluindo() === produto.id ? 'Excluindo...' : 'Excluir' }}
+                  </button>
+                </div>
+              </div>
+            } @else {
+              <div class="mt-4 flex gap-2">
+                <a [routerLink]="['/painel/marcas', marcaId, 'produtos', produto.id]" class="botao-secundario">Editar</a>
+                <button type="button" class="botao-secundario text-red-700" (click)="pedirConfirmacao(produto.id)">Excluir</button>
+              </div>
+            }
+          </li>
+        }
+      </ul>
+    }
+  </div>
+}

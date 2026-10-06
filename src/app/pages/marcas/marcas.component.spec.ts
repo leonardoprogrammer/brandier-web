@@ -80,6 +80,13 @@ describe('MarcasComponent', () => {
     expect(elemento().querySelector('a[href="/painel/marcas/1"]')).not.toBeNull();
   });
 
+  it('tem os links para as lojas e os produtos de cada marca', () => {
+    iniciar({ marcas: [alfa], limite: 2 });
+
+    expect(elemento().querySelector('a[href="/painel/marcas/1/lojas"]')).not.toBeNull();
+    expect(elemento().querySelector('a[href="/painel/marcas/1/produtos"]')).not.toBeNull();
+  });
+
   it('mostra erro e permite tentar de novo quando a listagem falha', () => {
     marcaService.listar.and.returnValues(throwError(() => new Error('falha')), of({ marcas: [alfa], limite: 2 }));
     fixture.detectChanges();

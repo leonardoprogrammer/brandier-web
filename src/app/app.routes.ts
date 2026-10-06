@@ -70,6 +70,40 @@ export const routes: Routes = [
           import('./pages/marca-formulario/marca-formulario.component').then((m) => m.MarcaFormularioComponent),
       },
       {
+        path: 'marcas/:marcaId/lojas',
+        title: 'Lojas - Brandier',
+        loadComponent: () => import('./pages/lojas/lojas.component').then((m) => m.LojasComponent),
+      },
+      {
+        path: 'marcas/:marcaId/lojas/nova',
+        title: 'Nova loja - Brandier',
+        loadComponent: () =>
+          import('./pages/loja-formulario/loja-formulario.component').then((m) => m.LojaFormularioComponent),
+      },
+      {
+        path: 'marcas/:marcaId/lojas/:id',
+        title: 'Editar loja - Brandier',
+        loadComponent: () =>
+          import('./pages/loja-formulario/loja-formulario.component').then((m) => m.LojaFormularioComponent),
+      },
+      {
+        path: 'marcas/:marcaId/produtos',
+        title: 'Produtos - Brandier',
+        loadComponent: () => import('./pages/produtos/produtos.component').then((m) => m.ProdutosComponent),
+      },
+      {
+        path: 'marcas/:marcaId/produtos/novo',
+        title: 'Novo produto - Brandier',
+        loadComponent: () =>
+          import('./pages/produto-formulario/produto-formulario.component').then((m) => m.ProdutoFormularioComponent),
+      },
+      {
+        path: 'marcas/:marcaId/produtos/:id',
+        title: 'Editar produto - Brandier',
+        loadComponent: () =>
+          import('./pages/produto-formulario/produto-formulario.component').then((m) => m.ProdutoFormularioComponent),
+      },
+      {
         path: 'sobre',
         title: 'Sobre o projeto - Brandier',
         loadComponent: () =>

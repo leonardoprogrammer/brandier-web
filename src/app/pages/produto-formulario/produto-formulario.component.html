@@ -1,0 +1,62 @@
+<div class="mx-auto max-w-xl">
+  <a [routerLink]="['/painel/marcas', marcaId, 'produtos']" class="link-discreto text-sm">&larr; Voltar para produtos</a>
+
+  <h1 class="mt-3 text-2xl font-bold tracking-tight text-slate-900">{{ edicao ? 'Editar produto' : 'Novo produto' }}</h1>
+
+  @if (carregando()) {
+    <p class="mt-6 text-slate-500" role="status">Carregando...</p>
+  } @else if (naoEncontrado()) {
+    <div class="aviso aviso-erro mt-6 space-y-3" role="alert">
+      <p>Produto não encontrado.</p>
+      <a [routerLink]="['/painel/marcas', marcaId, 'produtos']" class="botao-secundario">Voltar para produtos</a>
+    </div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="salvar()" novalidate class="mt-6 space-y-4 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+      @if (erro(); as mensagem) {
+        <div class="aviso aviso-erro space-y-2" role="alert">
+          <p>{{ mensagem }}</p>
+          @if (limiteAtingido()) {
+            <a [routerLink]="['/painel/marcas', marcaId, 'produtos']" class="link-discreto">Ver produtos da marca</a>
+          }
+        </div>
+      }
+
+      <div>
+        <label for="nome" class="campo-rotulo">Nome do produto</label>
+        <input
+          id="nome"
+          type="text"
+          formControlName="nome"
+          class="campo-entrada"
+          [attr.aria-invalid]="mensagemDoCampo('nome') ? 'true' : null"
+          [attr.aria-describedby]="mensagemDoCampo('nome') ? 'nome-erro' : null"
+        />
+        @if (mensagemDoCampo('nome'); as mensagem) {
+          <p id="nome-erro" class="campo-erro" role="alert">{{ mensagem }}</p>
+        }
+      </div>
+
+      <div>
+        <label for="codigo" class="campo-rotulo">Código ou SKU <span class="font-normal text-slate-500">(opcional)</span></label>
+        <input
+          id="codigo"
+          type="text"
+          formControlName="codigo"
+          class="campo-entrada"
+          [attr.aria-invalid]="mensagemDoCampo('codigo') ? 'true' : null"
+          [attr.aria-describedby]="mensagemDoCampo('codigo') ? 'codigo-erro' : null"
+        />
+        @if (mensagemDoCampo('codigo'); as mensagem) {
+          <p id="codigo-erro" class="campo-erro" role="alert">{{ mensagem }}</p>
+        }
+      </div>
+
+      <div class="flex gap-3">
+        <button type="submit" class="botao-primario w-auto" [disabled]="enviando()">
+          {{ enviando() ? 'Salvando...' : edicao ? 'Salvar alterações' : 'Cadastrar produto' }}
+        </button>
+        <a [routerLink]="['/painel/marcas', marcaId, 'produtos']" class="botao-secundario">Cancelar</a>
+      </div>
+    </form>
+  }
+</div>

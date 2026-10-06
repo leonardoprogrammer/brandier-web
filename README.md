@@ -30,6 +30,12 @@ A API fica no repositório `brandier-api`.
 | `/painel/marcas` | Lista de marcas, uso do limite e exclusão | Autenticado |
 | `/painel/marcas/nova` | Cria uma marca | Autenticado |
 | `/painel/marcas/:id` | Edita uma marca | Autenticado |
+| `/painel/marcas/:marcaId/lojas` | Lojas da marca, uso do limite e exclusão | Autenticado |
+| `/painel/marcas/:marcaId/lojas/nova` | Cadastra uma loja | Autenticado |
+| `/painel/marcas/:marcaId/lojas/:id` | Edita uma loja | Autenticado |
+| `/painel/marcas/:marcaId/produtos` | Catálogo de produtos da marca, uso do limite e exclusão | Autenticado |
+| `/painel/marcas/:marcaId/produtos/novo` | Cadastra um produto | Autenticado |
+| `/painel/marcas/:marcaId/produtos/:id` | Edita um produto | Autenticado |
 | `/painel/sobre` | Mesma página Sobre, dentro do painel | Autenticado |
 
 ## Estrutura do código
@@ -102,4 +108,4 @@ A aplicação sobe em `http://localhost:4200`. O arquivo `proxy.conf.json` encam
 npm test -- --watch=false --browsers=ChromeHeadless
 ```
 
-Cobrem validadores, leitura de erros da API, serviço de autenticação, interceptor, guards, as telas de autenticação, a página Sobre, o layout do painel e as telas de marcas. O build de produção (`npm run build`) também compila os templates em modo estrito.
+Cobrem validadores, leitura de erros da API, serviço de autenticação, interceptor, guards, as telas de autenticação, a página Sobre, o layout do painel e as telas de marcas, lojas e produtos. O build de produção (`npm run build`) também compila os templates em modo estrito.

@@ -6,6 +6,7 @@ import { finalize } from 'rxjs';
 
 import { extrairProblema, mensagemDeErro } from '../../core/api-error';
 import { MarcaService } from '../../services/marca.service';
+import { semSoEspacos } from '../../validators/texto.validator';
 
 const NOME_TAMANHO_MAXIMO = 80;
 const DESCRICAO_TAMANHO_MAXIMO = 500;
@@ -129,9 +130,4 @@ export class MarcaFormularioComponent implements OnInit {
       this.erro.set(camposNaoMapeados[0] ?? mensagemDeErro(problema));
     }
   }
-}
-
-function semSoEspacos(controle: { value: unknown }): { semSoEspacos: true } | null {
-  const valor = controle.value;
-  return typeof valor === 'string' && valor.length > 0 && valor.trim().length === 0 ? { semSoEspacos: true } : null;
 }

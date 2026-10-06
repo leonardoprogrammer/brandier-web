@@ -68,7 +68,9 @@
               </div>
             </div>
           } @else {
-            <div class="mt-4 flex gap-2">
+            <div class="mt-4 flex flex-wrap gap-2">
+              <a [routerLink]="['/painel/marcas', marca.id, 'lojas']" class="botao-secundario">Lojas</a>
+              <a [routerLink]="['/painel/marcas', marca.id, 'produtos']" class="botao-secundario">Produtos</a>
               <a [routerLink]="['/painel/marcas', marca.id]" class="botao-secundario">Editar</a>
               <button type="button" class="botao-secundario text-red-700" (click)="pedirConfirmacao(marca.id)">Excluir</button>
             </div>
