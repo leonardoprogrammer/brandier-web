@@ -151,7 +151,7 @@
 
                 @if (confirmando() !== convite.id) {
                   <button type="button" class="botao-secundario" (click)="pedirConfirmacao(convite.id)">
-                    {{ podeCancelar(convite) ? 'Cancelar convite' : 'Remover da lista' }}
+                    {{ podeCancelar(convite) ? 'Cancelar convite' : 'Apagar histórico' }}
                   </button>
                 }
               </div>
@@ -162,7 +162,7 @@
                     @if (podeCancelar(convite)) {
                       Cancelar o convite para <strong>{{ convite.email }}</strong>? O link enviado deixa de funcionar.
                     } @else {
-                      Remover o convite de <strong>{{ convite.email }}</strong> da lista?
+                      Apagar o histórico do convite de <strong>{{ convite.email }}</strong> da lista?
                     }
                   </p>
                   <div class="flex gap-2">

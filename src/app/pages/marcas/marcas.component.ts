@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
@@ -13,6 +13,7 @@ import { MarcaService } from '../../services/marca.service';
 })
 export class MarcasComponent implements OnInit {
   private readonly marcaService = inject(MarcaService);
+  private readonly elemento = inject<ElementRef<HTMLElement>>(ElementRef);
 
   protected readonly marcas = signal<Marca[]>([]);
   protected readonly limite = signal(0);
@@ -21,6 +22,7 @@ export class MarcasComponent implements OnInit {
   protected readonly confirmandoExclusao = signal<string | null>(null);
   protected readonly excluindo = signal<string | null>(null);
   protected readonly erroExclusao = signal<string | null>(null);
+  protected readonly menuAberto = signal<string | null>(null);
 
   protected readonly atingiuLimite = computed(() => this.marcas().length >= this.limite());
 
@@ -43,8 +45,54 @@ export class MarcasComponent implements OnInit {
       });
   }
 
+  protected alternarMenu(id: string, evento: Event): void {
+    evento.stopPropagation();
+    const abrindo = this.menuAberto() !== id;
+    this.menuAberto.set(abrindo ? id : null);
+    if (abrindo) {
+      setTimeout(() => this.itensDoMenu(id)[0]?.focus());
+    }
+  }
+
+  @HostListener('document:click')
+  protected fecharMenuAoClicarFora(): void {
+    this.menuAberto.set(null);
+  }
+
+  @HostListener('document:keydown.escape')
+  protected fecharMenuComEscape(): void {
+    const id = this.menuAberto();
+    if (id === null) {
+      return;
+    }
+    this.menuAberto.set(null);
+    this.elemento.nativeElement.querySelector<HTMLElement>(`#menu-botao-${CSS.escape(id)}`)?.focus();
+  }
+
+  protected aoTeclarNoMenu(evento: KeyboardEvent, id: string): void {
+    const itens = this.itensDoMenu(id);
+    const posicao = itens.indexOf(document.activeElement as HTMLElement);
+
+    if (evento.key === 'ArrowDown' || evento.key === 'ArrowUp') {
+      evento.preventDefault();
+      const passo = evento.key === 'ArrowDown' ? 1 : -1;
+      itens[(posicao + passo + itens.length) % itens.length]?.focus();
+    } else if (evento.key === 'Home' || evento.key === 'End') {
+      evento.preventDefault();
+      itens[evento.key === 'Home' ? 0 : itens.length - 1]?.focus();
+    } else if (evento.key === 'Tab') {
+      this.menuAberto.set(null);
+    }
+  }
+
+  private itensDoMenu(id: string): HTMLElement[] {
+    const menu = this.elemento.nativeElement.querySelector(`#menu-${CSS.escape(id)}`);
+    return menu ? Array.from(menu.querySelectorAll<HTMLElement>('[role="menuitem"]')) : [];
+  }
+
   protected pedirConfirmacao(id: string): void {
     this.erroExclusao.set(null);
+    this.menuAberto.set(null);
     this.confirmandoExclusao.set(id);
   }
 

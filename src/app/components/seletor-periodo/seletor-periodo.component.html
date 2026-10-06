@@ -10,7 +10,7 @@
       [attr.aria-pressed]="selecionada() === dias"
       (click)="escolher(dias)"
     >
-      {{ dias }} dias
+      {{ dias === 1 ? 'Hoje' : dias + ' dias' }}
     </button>
   }
   @if (permitirTodo()) {

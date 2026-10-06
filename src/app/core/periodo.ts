@@ -1,6 +1,7 @@
 import { Periodo } from '../models/painel.model';
 
 export const DIAS_MAXIMOS_DO_PERIODO = 366;
+export const DIAS_PADRAO_DO_PERIODO = 7;
 
 function inicioDoDia(data: Date): Date {
   return new Date(data.getFullYear(), data.getMonth(), data.getDate());

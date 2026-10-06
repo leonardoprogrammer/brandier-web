@@ -94,7 +94,7 @@ describe('PromotoresComponent', () => {
     const status = Array.from(elemento().querySelectorAll('[data-testid="status-convite"]')).map((e) => e.textContent?.trim());
     expect(status).toEqual(['Pendente', 'Recusado']);
     expect(botao('Cancelar convite')).toBeDefined();
-    expect(botao('Remover da lista')).toBeDefined();
+    expect(botao('Apagar histórico')).toBeDefined();
   });
 
   it('esconde o formulário e avisa quando o limite foi atingido', () => {

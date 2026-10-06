@@ -1,10 +1,16 @@
 import { Component, input, output, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
-import { DIAS_MAXIMOS_DO_PERIODO, paraCampoData, periodoEntreDatas, ultimosDias } from '../../core/periodo';
+import {
+  DIAS_MAXIMOS_DO_PERIODO,
+  DIAS_PADRAO_DO_PERIODO,
+  paraCampoData,
+  periodoEntreDatas,
+  ultimosDias,
+} from '../../core/periodo';
 import { Periodo } from '../../models/painel.model';
 
-export const OPCOES_DE_DIAS: readonly number[] = [7, 30, 90];
+export const OPCOES_DE_DIAS: readonly number[] = [1, 7, 30, 90];
 
 @Component({
   selector: 'app-seletor-periodo',
@@ -12,7 +18,7 @@ export const OPCOES_DE_DIAS: readonly number[] = [7, 30, 90];
   templateUrl: './seletor-periodo.component.html',
 })
 export class SeletorPeriodoComponent {
-  readonly diasIniciais = input<number>(30);
+  readonly diasIniciais = input<number>(DIAS_PADRAO_DO_PERIODO);
   readonly permitirTodo = input<boolean>(false);
   readonly periodoAlterado = output<Periodo>();
   readonly todoPeriodo = output<void>();

@@ -26,21 +26,49 @@ describe('SeletorPeriodoComponent', () => {
     fixture.detectChanges();
   }
 
-  it('marca 30 dias como selecionado por padrão', () => {
-    expect(botao('30 dias').getAttribute('aria-pressed')).toBe('true');
-    expect(botao('7 dias').getAttribute('aria-pressed')).toBe('false');
+  it('marca 7 dias como selecionado por padrão', () => {
+    expect(botao('7 dias').getAttribute('aria-pressed')).toBe('true');
+    expect(botao('Hoje').getAttribute('aria-pressed')).toBe('false');
+    expect(botao('30 dias').getAttribute('aria-pressed')).toBe('false');
+    expect(botao('90 dias').getAttribute('aria-pressed')).toBe('false');
     expect(emitidos).toEqual([]);
   });
 
+  it('oferece as opções Hoje, 7, 30 e 90 dias, nessa ordem', () => {
+    const rotulos = Array.from(elemento().querySelectorAll('[role="group"] button')).map((b) => b.textContent?.trim());
+
+    expect(rotulos).toEqual(['Hoje', '7 dias', '30 dias', '90 dias', 'Personalizado']);
+  });
+
+  it('"Hoje" emite do início de hoje até o início de amanhã', () => {
+    botao('Hoje').click();
+    fixture.detectChanges();
+
+    const hoje = new Date();
+    expect(emitidos.length).toBe(1);
+    expect(new Date(emitidos[0].de).getTime()).toBe(new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate()).getTime());
+    expect(new Date(emitidos[0].ate).getTime()).toBe(new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate() + 1).getTime());
+    expect(botao('Hoje').getAttribute('aria-pressed')).toBe('true');
+    expect(botao('7 dias').getAttribute('aria-pressed')).toBe('false');
+  });
+
+  it('respeita outro período inicial quando informado', () => {
+    fixture.componentRef.setInput('diasIniciais', 30);
+    fixture.detectChanges();
+
+    expect(botao('30 dias').getAttribute('aria-pressed')).toBe('true');
+    expect(botao('7 dias').getAttribute('aria-pressed')).toBe('false');
+  });
+
   it('emite o período dos últimos N dias ao escolher uma opção e destaca a escolhida', () => {
-    botao('7 dias').click();
+    botao('30 dias').click();
     fixture.detectChanges();
 
     expect(emitidos.length).toBe(1);
     const dias = (new Date(emitidos[0].ate).getTime() - new Date(emitidos[0].de).getTime()) / 86_400_000;
-    expect(Math.round(dias)).toBe(7);
-    expect(botao('7 dias').getAttribute('aria-pressed')).toBe('true');
-    expect(botao('30 dias').getAttribute('aria-pressed')).toBe('false');
+    expect(Math.round(dias)).toBe(30);
+    expect(botao('30 dias').getAttribute('aria-pressed')).toBe('true');
+    expect(botao('7 dias').getAttribute('aria-pressed')).toBe('false');
   });
 
   it('mostra os campos de data ao escolher "Personalizado"', () => {
@@ -106,7 +134,7 @@ describe('SeletorPeriodoComponent', () => {
     expect(semDatas).toBe(1);
     expect(emitidos).toEqual([]);
     expect(botao('Todo o período').getAttribute('aria-pressed')).toBe('true');
-    expect(botao('30 dias').getAttribute('aria-pressed')).toBe('false');
+    expect(botao('7 dias').getAttribute('aria-pressed')).toBe('false');
   });
 
   it('limpa o erro ao escolher uma opção pronta depois', () => {

@@ -54,6 +54,8 @@ export interface PainelMarca {
 
 export interface PainelAutor {
   periodo: Periodo;
+  possuiReposicoes: boolean;
+  marcasComoPromotor: number;
   totais: Totais;
   porMarca: Agregado[];
   porLoja: Agregado[];

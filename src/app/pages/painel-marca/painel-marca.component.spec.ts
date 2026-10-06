@@ -46,13 +46,13 @@ describe('PainelMarcaComponent', () => {
     expect(elemento().textContent).toContain('Carregando...');
   });
 
-  it('consulta o painel da marca da rota nos últimos 30 dias', () => {
+  it('consulta o painel da marca da rota nos últimos 7 dias', () => {
     painelService.marca.and.returnValue(of(painel));
     fixture.detectChanges();
 
     const [marcaId, consulta] = painelService.marca.calls.mostRecent().args;
     expect(marcaId).toBe('m1');
-    expect(Math.round((new Date(consulta.ate).getTime() - new Date(consulta.de).getTime()) / 86_400_000)).toBe(30);
+    expect(Math.round((new Date(consulta.ate).getTime() - new Date(consulta.de).getTime()) / 86_400_000)).toBe(7);
   });
 
   it('mostra totais, os três rankings, o uso dos limites e os promotores sem atividade', () => {

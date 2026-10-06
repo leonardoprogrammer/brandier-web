@@ -80,7 +80,7 @@
             @if (confirmandoExclusao() === produto.id) {
               <div class="mt-4 space-y-3 rounded-lg border border-red-200 bg-red-50 p-3" role="alertdialog" [attr.aria-label]="'Confirmar exclusão do produto ' + produto.nome">
                 <p class="text-sm text-red-800">
-                  Excluir o produto <strong>{{ produto.nome }}</strong>? Essa ação não pode ser desfeita.
+                  Excluir o produto <strong>{{ produto.nome }}</strong>? Esta ação é irreversível.
                 </p>
                 <div class="flex gap-2">
                   <button type="button" class="botao-secundario" [disabled]="excluindo() === produto.id" (click)="cancelarExclusao()">Cancelar</button>

@@ -4,7 +4,7 @@ import { finalize, forkJoin, of } from 'rxjs';
 
 import { SeletorPeriodoComponent } from '../../components/seletor-periodo/seletor-periodo.component';
 import { formatarDataHora } from '../../core/data-hora';
-import { ultimosDias } from '../../core/periodo';
+import { DIAS_PADRAO_DO_PERIODO, ultimosDias } from '../../core/periodo';
 import { Loja } from '../../models/loja.model';
 import { Periodo } from '../../models/painel.model';
 import { Produto } from '../../models/produto.model';
@@ -205,7 +205,7 @@ export class RelatoriosComponent implements OnInit {
   }
 
   private filtroInicial(): FiltroDoRelatorio {
-    const periodo = ultimosDias(30);
+    const periodo = ultimosDias(DIAS_PADRAO_DO_PERIODO);
     return { lojaId: '', autorId: '', produtoId: '', de: periodo.de, ate: periodo.ate, ordenar: 'data', direcao: 'desc' };
   }
 }

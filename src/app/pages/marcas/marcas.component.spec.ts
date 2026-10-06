@@ -30,6 +30,25 @@ describe('MarcasComponent', () => {
     fixture.detectChanges();
   }
 
+  function botaoDoMenu(nomeDaMarca: string): HTMLButtonElement {
+    return elemento().querySelector<HTMLButtonElement>(`button[aria-label="Opções da marca ${nomeDaMarca}"]`)!;
+  }
+
+  function abrirMenu(nomeDaMarca = 'Alfa'): void {
+    botaoDoMenu(nomeDaMarca).click();
+    fixture.detectChanges();
+  }
+
+  function itemDoMenu(rotulo: string): HTMLElement {
+    return Array.from(elemento().querySelectorAll<HTMLElement>('[role="menuitem"]')).find((i) => i.textContent?.trim() === rotulo)!;
+  }
+
+  function pedirExclusao(nomeDaMarca = 'Alfa'): void {
+    abrirMenu(nomeDaMarca);
+    itemDoMenu('Excluir').click();
+    fixture.detectChanges();
+  }
+
   function botao(texto: string): HTMLButtonElement {
     return Array.from(elemento().querySelectorAll('button')).find((b) => b.textContent?.trim() === texto)!;
   }
@@ -74,10 +93,140 @@ describe('MarcasComponent', () => {
     expect(elemento().querySelector('#aviso-limite')?.textContent).toContain('limite de 2 marcas');
   });
 
-  it('tem o link de edição de cada marca', () => {
-    iniciar({ marcas: [alfa], limite: 2 });
+  describe('menu de opções (três pontinhos)', () => {
+    it('cada marca tem o botão do menu no canto, fechado e com atributos de acessibilidade', () => {
+      iniciar({ marcas: [alfa, beta], limite: 5 });
 
-    expect(elemento().querySelector('a[href="/painel/marcas/1"]')).not.toBeNull();
+      expect(elemento().querySelectorAll('button[aria-haspopup="menu"]').length).toBe(2);
+      const botaoAlfa = botaoDoMenu('Alfa');
+      expect(botaoAlfa.getAttribute('aria-expanded')).toBe('false');
+      expect(botaoAlfa.getAttribute('aria-label')).toBe('Opções da marca Alfa');
+      expect(botaoAlfa.closest('li')?.textContent).toContain('Alfa');
+      expect(elemento().querySelector('[role="menu"]')).toBeNull();
+    });
+
+    it('Editar e Excluir não aparecem soltos no cartão, só dentro do menu', () => {
+      iniciar({ marcas: [alfa], limite: 2 });
+
+      expect(elemento().querySelector('a[href="/painel/marcas/1"]')).toBeNull();
+      expect(Array.from(elemento().querySelectorAll('button')).some((b) => b.textContent?.trim() === 'Excluir')).toBeFalse();
+
+      abrirMenu();
+
+      const menu = elemento().querySelector('[role="menu"]')!;
+      expect(menu.querySelector('a[href="/painel/marcas/1"]')?.textContent?.trim()).toBe('Editar');
+      expect(menu.querySelector('button')?.textContent?.trim()).toBe('Excluir');
+    });
+
+    it('abrir marca o botão como expandido e liga o menu ao botão', () => {
+      iniciar({ marcas: [alfa], limite: 2 });
+
+      abrirMenu();
+
+      expect(botaoDoMenu('Alfa').getAttribute('aria-expanded')).toBe('true');
+      expect(botaoDoMenu('Alfa').getAttribute('aria-controls')).toBe('menu-1');
+      expect(elemento().querySelector('#menu-1')?.getAttribute('aria-labelledby')).toBe('menu-botao-1');
+    });
+
+    it('clicar de novo no botão fecha o menu', () => {
+      iniciar({ marcas: [alfa], limite: 2 });
+
+      abrirMenu();
+      abrirMenu();
+
+      expect(elemento().querySelector('[role="menu"]')).toBeNull();
+      expect(botaoDoMenu('Alfa').getAttribute('aria-expanded')).toBe('false');
+    });
+
+    it('só um menu fica aberto por vez', () => {
+      iniciar({ marcas: [alfa, beta], limite: 5 });
+
+      abrirMenu('Alfa');
+      abrirMenu('Beta');
+
+      expect(elemento().querySelectorAll('[role="menu"]').length).toBe(1);
+      expect(elemento().querySelector('#menu-2')).not.toBeNull();
+      expect(elemento().querySelector('#menu-1')).toBeNull();
+    });
+
+    it('clicar fora fecha o menu', () => {
+      iniciar({ marcas: [alfa], limite: 2 });
+      abrirMenu();
+
+      document.body.click();
+      fixture.detectChanges();
+
+      expect(elemento().querySelector('[role="menu"]')).toBeNull();
+    });
+
+    it('Escape fecha o menu e devolve o foco ao botão', () => {
+      iniciar({ marcas: [alfa], limite: 2 });
+      abrirMenu();
+
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+      fixture.detectChanges();
+
+      expect(elemento().querySelector('[role="menu"]')).toBeNull();
+      expect(document.activeElement).toBe(botaoDoMenu('Alfa'));
+    });
+
+    it('Escape sem menu aberto não faz nada', () => {
+      iniciar({ marcas: [alfa], limite: 2 });
+
+      expect(() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))).not.toThrow();
+    });
+
+    it('as setas movem o foco entre os itens e dão a volta', () => {
+      iniciar({ marcas: [alfa], limite: 2 });
+      abrirMenu();
+      const [editar, excluir] = Array.from(elemento().querySelectorAll<HTMLElement>('[role="menuitem"]'));
+      editar.focus();
+
+      const menu = elemento().querySelector('[role="menu"]')!;
+      menu.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      expect(document.activeElement).toBe(excluir);
+
+      menu.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      expect(document.activeElement).toBe(editar);
+
+      menu.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
+      expect(document.activeElement).toBe(excluir);
+
+      menu.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
+      expect(document.activeElement).toBe(editar);
+
+      menu.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
+      expect(document.activeElement).toBe(excluir);
+    });
+
+    it('Tab fecha o menu', () => {
+      iniciar({ marcas: [alfa], limite: 2 });
+      abrirMenu();
+
+      elemento().querySelector('[role="menu"]')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
+      fixture.detectChanges();
+
+      expect(elemento().querySelector('[role="menu"]')).toBeNull();
+    });
+
+    it('escolher Excluir fecha o menu e abre a confirmação da marca certa', () => {
+      iniciar({ marcas: [alfa, beta], limite: 5 });
+
+      pedirExclusao('Beta');
+
+      expect(elemento().querySelector('[role="menu"]')).toBeNull();
+      const dialogos = elemento().querySelectorAll('[role="alertdialog"]');
+      expect(dialogos.length).toBe(1);
+      expect(dialogos[0].textContent).toContain('Beta');
+    });
+
+    it('as ações de navegação continuam visíveis no cartão sem abrir o menu', () => {
+      iniciar({ marcas: [alfa], limite: 2 });
+
+      ['resumo', 'lojas', 'produtos', 'promotores', 'reposicoes'].forEach((pagina) =>
+        expect(elemento().querySelector(`a[href="/painel/marcas/1/${pagina}"]`)).withContext(pagina).not.toBeNull(),
+      );
+    });
   });
 
   it('tem os links para as lojas e os produtos de cada marca', () => {
@@ -108,8 +257,7 @@ describe('MarcasComponent', () => {
   it('pede confirmação antes de excluir e permite cancelar', () => {
     iniciar({ marcas: [alfa], limite: 2 });
 
-    botao('Excluir').click();
-    fixture.detectChanges();
+    pedirExclusao();
 
     expect(elemento().querySelector('[role="alertdialog"]')?.textContent).toContain('Excluir a marca');
     expect(marcaService.excluir).not.toHaveBeenCalled();
@@ -125,8 +273,7 @@ describe('MarcasComponent', () => {
     iniciar({ marcas: [alfa, beta], limite: 2 });
     marcaService.excluir.and.returnValue(of(undefined));
 
-    botao('Excluir').click();
-    fixture.detectChanges();
+    pedirExclusao();
     botao('Excluir').click();
     fixture.detectChanges();
 
@@ -142,8 +289,7 @@ describe('MarcasComponent', () => {
       throwError(() => new HttpErrorResponse({ status: 404, error: { codigo: 'NAO_ENCONTRADO', detail: 'Marca não encontrada.' } })),
     );
 
-    botao('Excluir').click();
-    fixture.detectChanges();
+    pedirExclusao();
     botao('Excluir').click();
     fixture.detectChanges();
 
@@ -155,8 +301,7 @@ describe('MarcasComponent', () => {
     iniciar({ marcas: [alfa], limite: 2 });
     marcaService.excluir.and.returnValue(new Subject<void>());
 
-    botao('Excluir').click();
-    fixture.detectChanges();
+    pedirExclusao();
     botao('Excluir').click();
     fixture.detectChanges();
 

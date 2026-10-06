@@ -77,7 +77,7 @@
 
               @if (confirmando() === reposicao.id) {
                 <div class="mt-4 space-y-3 rounded-lg border border-red-200 bg-red-50 p-3" role="alertdialog" [attr.aria-label]="'Confirmar exclusão da reposição em ' + reposicao.lojaNome">
-                  <p class="text-sm text-red-800">Excluir esta reposição? Essa ação não pode ser desfeita.</p>
+                  <p class="text-sm text-red-800">Excluir esta reposição? Esta ação é irreversível.</p>
                   <div class="flex gap-2">
                     <button type="button" class="botao-secundario" [disabled]="excluindo() === reposicao.id" (click)="cancelarExclusao()">Cancelar</button>
                     <button

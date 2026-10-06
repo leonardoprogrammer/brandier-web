@@ -5,7 +5,7 @@ import { finalize } from 'rxjs';
 import { ItemDoRanking, RankingComponent } from '../../components/ranking/ranking.component';
 import { SeletorPeriodoComponent } from '../../components/seletor-periodo/seletor-periodo.component';
 import { extrairProblema } from '../../core/api-error';
-import { ultimosDias } from '../../core/periodo';
+import { DIAS_PADRAO_DO_PERIODO, ultimosDias } from '../../core/periodo';
 import { Agregado, PainelMarca, Periodo } from '../../models/painel.model';
 import { PainelService } from '../../services/painel.service';
 
@@ -19,7 +19,7 @@ export class PainelMarcaComponent implements OnInit {
 
   protected readonly marcaId = inject(ActivatedRoute).snapshot.paramMap.get('marcaId') ?? '';
 
-  protected readonly periodo = signal<Periodo>(ultimosDias(30));
+  protected readonly periodo = signal<Periodo>(ultimosDias(DIAS_PADRAO_DO_PERIODO));
   protected readonly painel = signal<PainelMarca | null>(null);
   protected readonly carregando = signal(true);
   protected readonly falhou = signal(false);

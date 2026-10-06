@@ -113,7 +113,7 @@ describe('RelatoriosComponent', () => {
   }
 
   describe('marcas', () => {
-    it('com uma única marca seleciona-a, carrega os filtros e consulta os últimos 30 dias', async () => {
+    it('com uma única marca seleciona-a, carrega os filtros e consulta os últimos 7 dias', async () => {
       await montar();
       fixture.detectChanges();
 
@@ -127,7 +127,7 @@ describe('RelatoriosComponent', () => {
       expect(tamanho).toBe(20);
       expect(filtro.ordenar).toBe('data');
       expect(filtro.direcao).toBe('desc');
-      expect(Math.round((new Date(filtro.ate!).getTime() - new Date(filtro.de!).getTime()) / 86_400_000)).toBe(30);
+      expect(Math.round((new Date(filtro.ate!).getTime() - new Date(filtro.de!).getTime()) / 86_400_000)).toBe(7);
     });
 
     it('junta marcas geridas e de promotor, e o gestor prevalece quando a marca está nas duas', async () => {

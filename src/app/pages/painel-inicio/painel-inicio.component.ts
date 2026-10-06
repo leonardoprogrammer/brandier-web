@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
@@ -6,7 +6,7 @@ import { ConvitesRecebidosComponent } from '../../components/convites-recebidos/
 import { ItemDoRanking, RankingComponent } from '../../components/ranking/ranking.component';
 import { SeletorPeriodoComponent } from '../../components/seletor-periodo/seletor-periodo.component';
 import { formatarDataHora } from '../../core/data-hora';
-import { ultimosDias } from '../../core/periodo';
+import { DIAS_PADRAO_DO_PERIODO, ultimosDias } from '../../core/periodo';
 import { Agregado, PainelAutor, PainelGestor, Periodo } from '../../models/painel.model';
 import { AuthService } from '../../services/auth.service';
 import { PainelService } from '../../services/painel.service';
@@ -23,13 +23,27 @@ export class PainelInicioComponent implements OnInit {
   protected readonly usuario = this.auth.usuario;
   protected readonly formatarDataHora = formatarDataHora;
 
-  protected readonly periodo = signal<Periodo>(ultimosDias(30));
+  protected readonly periodo = signal<Periodo>(ultimosDias(DIAS_PADRAO_DO_PERIODO));
   protected readonly autor = signal<PainelAutor | null>(null);
   protected readonly gestor = signal<PainelGestor | null>(null);
   protected readonly carregandoAutor = signal(true);
   protected readonly carregandoGestor = signal(true);
   protected readonly falhouAutor = signal(false);
   protected readonly falhouGestor = signal(false);
+
+  protected readonly temReposicoes = computed(() => this.autor()?.possuiReposicoes === true);
+  protected readonly temMarcas = computed(() => (this.gestor()?.marcas.length ?? 0) > 0);
+  protected readonly primeiraCarga = computed(
+    () => (this.carregandoAutor() && !this.autor() && !this.falhouAutor()) || (this.carregandoGestor() && !this.gestor() && !this.falhouGestor()),
+  );
+  protected readonly marcasComoPromotor = computed(() => this.autor()?.marcasComoPromotor ?? 0);
+  protected readonly semVinculos = computed(
+    () => this.autor() !== null && this.gestor() !== null && !this.temReposicoes() && !this.temMarcas(),
+  );
+  protected readonly semNada = computed(() => this.semVinculos() && this.marcasComoPromotor() === 0);
+  protected readonly soPromotor = computed(() => this.semVinculos() && this.marcasComoPromotor() > 0);
+  protected readonly mostrarAutor = computed(() => this.temReposicoes() || this.falhouAutor());
+  protected readonly mostrarGestor = computed(() => this.temMarcas() || this.falhouGestor());
 
   ngOnInit(): void {
     this.carregar();
