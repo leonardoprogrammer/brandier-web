@@ -44,7 +44,7 @@ A API fica no repositório `brandier-api`.
 | `/painel/reposicoes` | Minhas reposições, paginadas | Autenticado |
 | `/painel/reposicoes/nova` | Registra uma reposição | Autenticado |
 | `/painel/reposicoes/:marcaId/:id` | Edita uma reposição (dentro do prazo, para promotores) | Autenticado |
-| `/painel/promotor` | Marcas em que sou promotor e sair delas | Autenticado |
+| `/painel/promotor` | Convites recebidos, marcas em que sou promotor e sair delas | Autenticado |
 | `/painel/sobre` | Mesma página Sobre, dentro do painel | Autenticado |
 
 ## Estrutura do código

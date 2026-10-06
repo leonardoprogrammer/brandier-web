@@ -4,6 +4,7 @@ import { provideRouter } from '@angular/router';
 import { Subject, of, throwError } from 'rxjs';
 
 import { MeusVinculos, VinculoPromotor } from '../../models/promotor.model';
+import { ConviteService } from '../../services/convite.service';
 import { PromotorService } from '../../services/promotor.service';
 import { PromotorVinculosComponent } from './promotor-vinculos.component';
 
@@ -11,13 +12,27 @@ describe('PromotorVinculosComponent', () => {
   const alfa: VinculoPromotor = { marcaId: 'm1', marcaNome: 'Alfa', gestorNome: 'Gestor Silva', entrouEm: '2026-02-01T12:00:00Z' };
   const beta: VinculoPromotor = { marcaId: 'm2', marcaNome: 'Beta', gestorNome: 'Outra Gestora', entrouEm: '2026-02-02T12:00:00Z' };
   let fixture: ComponentFixture<PromotorVinculosComponent>;
+  const convitePendente = (id: string, marcaNome: string) => ({
+    id,
+    marcaNome,
+    gestorNome: 'Gestor',
+    expiraEm: '2026-03-08T12:00:00Z',
+    criadoEm: '2026-03-01T12:00:00Z',
+  });
   let promotorService: jasmine.SpyObj<PromotorService>;
+  let conviteService: jasmine.SpyObj<ConviteService>;
 
   beforeEach(async () => {
     promotorService = jasmine.createSpyObj<PromotorService>('PromotorService', ['meusVinculos', 'sair']);
+    conviteService = jasmine.createSpyObj<ConviteService>('ConviteService', ['recebidos', 'aceitarPorId', 'recusarPorId']);
+    conviteService.recebidos.and.returnValue(of({ convites: [] }));
     await TestBed.configureTestingModule({
       imports: [PromotorVinculosComponent],
-      providers: [provideRouter([]), { provide: PromotorService, useValue: promotorService }],
+      providers: [
+        provideRouter([]),
+        { provide: PromotorService, useValue: promotorService },
+        { provide: ConviteService, useValue: conviteService },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(PromotorVinculosComponent);
@@ -54,6 +69,34 @@ describe('PromotorVinculosComponent', () => {
     iniciar([]);
 
     expect(elemento().textContent).toContain('Você ainda não é promotor de nenhuma marca');
+  });
+
+  it('mostra os convites pendentes na própria página', () => {
+    conviteService.recebidos.and.returnValue(of({ convites: [convitePendente('c1', 'Gama')] }));
+    iniciar([]);
+
+    expect(elemento().querySelector('[data-testid="convite-recebido"]')?.textContent).toContain('Gama');
+  });
+
+  it('recarrega as marcas depois de aceitar um convite, mas não depois de recusar', () => {
+    conviteService.recebidos.and.returnValue(of({ convites: [convitePendente('c1', 'Gama'), convitePendente('c2', 'Delta')] }));
+    conviteService.aceitarPorId.and.returnValue(of({ marcaId: 'm4', marcaNome: 'Delta', gestorNome: 'Gestor', entrouEm: '2026-03-03T12:00:00Z' }));
+    conviteService.recusarPorId.and.returnValue(of(undefined));
+    iniciar([alfa]);
+    expect(promotorService.meusVinculos).toHaveBeenCalledTimes(1);
+
+    botao('Recusar').click();
+    fixture.detectChanges();
+    expect(promotorService.meusVinculos).toHaveBeenCalledTimes(1);
+
+    promotorService.meusVinculos.and.returnValue(
+      of({ vinculos: [alfa, { marcaId: 'm4', marcaNome: 'Delta', gestorNome: 'Gestor', entrouEm: '2026-03-03T12:00:00Z' }] }),
+    );
+    botao('Aceitar').click();
+    fixture.detectChanges();
+
+    expect(promotorService.meusVinculos).toHaveBeenCalledTimes(2);
+    expect(elemento().textContent).toContain('Gestor: Gestor');
   });
 
   it('mostra erro e permite tentar de novo quando a busca falha', () => {

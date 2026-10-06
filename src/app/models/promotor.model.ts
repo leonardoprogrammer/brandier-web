@@ -40,3 +40,15 @@ export interface VinculoPromotor {
 export interface MeusVinculos {
   vinculos: VinculoPromotor[];
 }
+
+export interface ConvitePendente {
+  id: string;
+  marcaNome: string;
+  gestorNome: string;
+  expiraEm: string;
+  criadoEm: string;
+}
+
+export interface ConvitesRecebidos {
+  convites: ConvitePendente[];
+}

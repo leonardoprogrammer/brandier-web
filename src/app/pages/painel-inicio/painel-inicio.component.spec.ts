@@ -7,6 +7,7 @@ import { PainelAutor, PainelGestor } from '../../models/painel.model';
 import { Reposicao } from '../../models/reposicao.model';
 import { Usuario } from '../../models/usuario.model';
 import { AuthService } from '../../services/auth.service';
+import { ConviteService } from '../../services/convite.service';
 import { PainelService } from '../../services/painel.service';
 import { PainelInicioComponent } from './painel-inicio.component';
 
@@ -52,16 +53,24 @@ describe('PainelInicioComponent', () => {
 
   let fixture: ComponentFixture<PainelInicioComponent>;
   let painelService: jasmine.SpyObj<PainelService>;
+  let conviteService: jasmine.SpyObj<ConviteService>;
 
   beforeEach(async () => {
     painelService = jasmine.createSpyObj<PainelService>('PainelService', ['gestor', 'minhasReposicoes', 'marca']);
+    conviteService = jasmine.createSpyObj<ConviteService>('ConviteService', ['recebidos', 'aceitarPorId', 'recusarPorId']);
+    conviteService.recebidos.and.returnValue(of({ convites: [] }));
     const auth = jasmine.createSpyObj<AuthService>('AuthService', ['sair']);
     Object.defineProperty(auth, 'usuario', {
       value: signal<Usuario | null>({ id: '1', nome: 'Pessoa Teste', email: 'pessoa@exemplo.com' }).asReadonly(),
     });
     await TestBed.configureTestingModule({
       imports: [PainelInicioComponent],
-      providers: [provideRouter([]), { provide: AuthService, useValue: auth }, { provide: PainelService, useValue: painelService }],
+      providers: [
+        provideRouter([]),
+        { provide: AuthService, useValue: auth },
+        { provide: PainelService, useValue: painelService },
+        { provide: ConviteService, useValue: conviteService },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(PainelInicioComponent);
@@ -174,6 +183,21 @@ describe('PainelInicioComponent', () => {
       expect(painelService.minhasReposicoes).toHaveBeenCalledTimes(1);
       expect(elemento().querySelector('[data-testid="marca"]')).not.toBeNull();
     });
+  });
+
+  it('mostra os convites pendentes no topo do painel', () => {
+    conviteService.recebidos.and.returnValue(
+      of({ convites: [{ id: 'c1', marcaNome: 'Gama', gestorNome: 'Gestor', expiraEm: '2026-03-08T12:00:00Z', criadoEm: '2026-03-01T12:00:00Z' }] }),
+    );
+    iniciar(autorVazio, gestorSemMarcas);
+
+    expect(elemento().querySelector('[data-testid="convite-recebido"]')?.textContent).toContain('Gama');
+  });
+
+  it('não mostra a área de convites quando não há nenhum', () => {
+    iniciar(autorVazio, gestorSemMarcas);
+
+    expect(elemento().querySelector('app-convites-recebidos section')).toBeNull();
   });
 
   it('recarrega as duas visões ao mudar o período', () => {

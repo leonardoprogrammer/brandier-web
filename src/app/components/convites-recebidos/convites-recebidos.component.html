@@ -1,0 +1,40 @@
+@if (convites().length > 0 || confirmacao() || erro() || falhou()) {
+  <section class="mt-6 space-y-3" aria-labelledby="titulo-convites-recebidos">
+    @if (convites().length > 0) {
+      <h2 id="titulo-convites-recebidos" class="text-lg font-semibold text-slate-900">
+        {{ convites().length === 1 ? 'Você tem um convite pendente' : 'Você tem ' + convites().length + ' convites pendentes' }}
+      </h2>
+    }
+
+    @if (confirmacao(); as mensagem) {
+      <p class="aviso aviso-sucesso" role="status" data-testid="confirmacao">{{ mensagem }}</p>
+    }
+    @if (erro(); as mensagem) {
+      <p class="aviso aviso-erro" role="alert" data-testid="erro-resposta">{{ mensagem }}</p>
+    }
+    @if (falhou()) {
+      <div class="aviso aviso-erro flex flex-wrap items-center justify-between gap-3" role="alert" data-testid="erro-carregamento">
+        <span>Não foi possível verificar seus convites.</span>
+        <button type="button" class="botao-secundario" (click)="carregar()">Tentar de novo</button>
+      </div>
+    }
+
+    <ul class="space-y-3">
+      @for (convite of convites(); track convite.id) {
+        <li class="rounded-2xl border border-indigo-200 bg-indigo-50 p-4" data-testid="convite-recebido">
+          <p class="text-sm text-slate-800">
+            <strong>{{ convite.gestorNome }}</strong> convidou você para ser promotor da marca
+            <strong>{{ convite.marcaNome }}</strong>.
+          </p>
+          <p class="mt-1 text-xs text-slate-600">Válido até {{ formatarData(convite.expiraEm) }}.</p>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <button type="button" class="botao-primario w-auto" [disabled]="respondendo() === convite.id" (click)="aceitar(convite)">
+              {{ respondendo() === convite.id ? 'Enviando...' : 'Aceitar' }}
+            </button>
+            <button type="button" class="botao-secundario" [disabled]="respondendo() === convite.id" (click)="recusar(convite)">Recusar</button>
+          </div>
+        </li>
+      }
+    </ul>
+  </section>
+}

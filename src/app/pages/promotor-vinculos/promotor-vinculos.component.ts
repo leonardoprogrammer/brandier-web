@@ -1,12 +1,14 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { finalize } from 'rxjs';
 
+import { ConvitesRecebidosComponent, RespostaAoConvite } from '../../components/convites-recebidos/convites-recebidos.component';
 import { extrairProblema, mensagemDeErro } from '../../core/api-error';
 import { VinculoPromotor } from '../../models/promotor.model';
 import { PromotorService } from '../../services/promotor.service';
 
 @Component({
   selector: 'app-promotor-vinculos',
+  imports: [ConvitesRecebidosComponent],
   templateUrl: './promotor-vinculos.component.html',
 })
 export class PromotorVinculosComponent implements OnInit {
@@ -33,6 +35,12 @@ export class PromotorVinculosComponent implements OnInit {
         next: (resposta) => this.vinculos.set(resposta.vinculos),
         error: () => this.falhou.set(true),
       });
+  }
+
+  protected aoResponderConvite(resposta: RespostaAoConvite): void {
+    if (resposta === 'aceito') {
+      this.carregar();
+    }
   }
 
   protected pedirConfirmacao(marcaId: string): void {

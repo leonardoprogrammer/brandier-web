@@ -3,6 +3,8 @@
   <p class="mt-1 text-slate-600">As marcas em que você foi convidado para registrar reposições.</p>
 </header>
 
+<app-convites-recebidos (respondido)="aoResponderConvite($event)" />
+
 @if (erroSaida(); as mensagem) {
   <p class="aviso aviso-erro mt-4" role="alert">{{ mensagem }}</p>
 }

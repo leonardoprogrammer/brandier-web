@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
+import { ConvitesRecebidosComponent } from '../../components/convites-recebidos/convites-recebidos.component';
 import { ItemDoRanking, RankingComponent } from '../../components/ranking/ranking.component';
 import { SeletorPeriodoComponent } from '../../components/seletor-periodo/seletor-periodo.component';
 import { formatarDataHora } from '../../core/data-hora';
@@ -12,7 +13,7 @@ import { PainelService } from '../../services/painel.service';
 
 @Component({
   selector: 'app-painel-inicio',
-  imports: [RouterLink, RankingComponent, SeletorPeriodoComponent],
+  imports: [RouterLink, ConvitesRecebidosComponent, RankingComponent, SeletorPeriodoComponent],
   templateUrl: './painel-inicio.component.html',
 })
 export class PainelInicioComponent implements OnInit {
