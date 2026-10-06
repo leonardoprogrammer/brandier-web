@@ -2,6 +2,7 @@ export interface Produto {
   id: string;
   nome: string;
   codigo: string | null;
+  ativo: boolean;
   criadoEm: string;
 }
 
@@ -13,4 +14,5 @@ export interface ProdutosDaMarca {
 export interface DadosProduto {
   nome: string;
   codigo: string;
+  ativo?: boolean;
 }

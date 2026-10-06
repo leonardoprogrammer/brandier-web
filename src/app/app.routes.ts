@@ -41,6 +41,11 @@ export const routes: Routes = [
       import('./pages/verificar-email/verificar-email.component').then((m) => m.VerificarEmailComponent),
   },
   {
+    path: 'convite',
+    title: 'Convite - Brandier',
+    loadComponent: () => import('./pages/convite/convite.component').then((m) => m.ConviteComponent),
+  },
+  {
     path: 'painel',
     canActivate: [authGuard],
     loadComponent: () =>
@@ -68,6 +73,11 @@ export const routes: Routes = [
         title: 'Editar marca - Brandier',
         loadComponent: () =>
           import('./pages/marca-formulario/marca-formulario.component').then((m) => m.MarcaFormularioComponent),
+      },
+      {
+        path: 'marcas/:marcaId/resumo',
+        title: 'Painel da marca - Brandier',
+        loadComponent: () => import('./pages/painel-marca/painel-marca.component').then((m) => m.PainelMarcaComponent),
       },
       {
         path: 'marcas/:marcaId/lojas',
@@ -102,6 +112,48 @@ export const routes: Routes = [
         title: 'Editar produto - Brandier',
         loadComponent: () =>
           import('./pages/produto-formulario/produto-formulario.component').then((m) => m.ProdutoFormularioComponent),
+      },
+      {
+        path: 'marcas/:marcaId/promotores',
+        title: 'Promotores - Brandier',
+        loadComponent: () => import('./pages/promotores/promotores.component').then((m) => m.PromotoresComponent),
+      },
+      {
+        path: 'marcas/:marcaId/reposicoes',
+        title: 'Reposições da marca - Brandier',
+        loadComponent: () => import('./pages/reposicoes/reposicoes.component').then((m) => m.ReposicoesComponent),
+      },
+      {
+        path: 'reposicoes',
+        title: 'Minhas reposições - Brandier',
+        loadComponent: () => import('./pages/reposicoes/reposicoes.component').then((m) => m.ReposicoesComponent),
+      },
+      {
+        path: 'reposicoes/nova',
+        title: 'Nova reposição - Brandier',
+        loadComponent: () =>
+          import('./pages/reposicao-formulario/reposicao-formulario.component').then(
+            (m) => m.ReposicaoFormularioComponent,
+          ),
+      },
+      {
+        path: 'reposicoes/:marcaId/:id',
+        title: 'Editar reposição - Brandier',
+        loadComponent: () =>
+          import('./pages/reposicao-formulario/reposicao-formulario.component').then(
+            (m) => m.ReposicaoFormularioComponent,
+          ),
+      },
+      {
+        path: 'relatorios',
+        title: 'Relatórios - Brandier',
+        loadComponent: () => import('./pages/relatorios/relatorios.component').then((m) => m.RelatoriosComponent),
+      },
+      {
+        path: 'promotor',
+        title: 'Como promotor - Brandier',
+        loadComponent: () =>
+          import('./pages/promotor-vinculos/promotor-vinculos.component').then((m) => m.PromotorVinculosComponent),
       },
       {
         path: 'sobre',

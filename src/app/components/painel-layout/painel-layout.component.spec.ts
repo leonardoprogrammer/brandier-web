@@ -38,11 +38,14 @@ describe('PainelLayoutComponent', () => {
     expect(elemento().querySelector('[data-testid="nome-usuario"]')?.textContent).toContain('Pessoa Teste');
   });
 
-  it('tem o menu com Início, Marcas e Sobre', () => {
+  it('tem o menu com Início, Marcas, Reposições, Relatórios, Como promotor e Sobre', () => {
     const menu = elemento().querySelector('nav[aria-label="Menu do painel"]')!;
 
     expect(menu.querySelector('a[href="/painel"]')).not.toBeNull();
     expect(menu.querySelector('a[href="/painel/marcas"]')).not.toBeNull();
+    expect(menu.querySelector('a[href="/painel/reposicoes"]')).not.toBeNull();
+    expect(menu.querySelector('a[href="/painel/relatorios"]')).not.toBeNull();
+    expect(menu.querySelector('a[href="/painel/promotor"]')).not.toBeNull();
     expect(menu.querySelector('a[href="/painel/sobre"]')).not.toBeNull();
   });
 

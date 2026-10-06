@@ -1,30 +1,113 @@
-<h1 class="text-2xl font-bold tracking-tight text-slate-900">Olá, {{ usuario()?.nome }}!</h1>
-<p class="mt-2 text-slate-600">Gerencie suas marcas e acompanhe o que acontece nos pontos de venda.</p>
+<div class="flex flex-wrap items-start justify-between gap-4">
+  <div>
+    <h1 class="text-2xl font-bold tracking-tight text-slate-900">Olá, {{ usuario()?.nome }}!</h1>
+    <p class="mt-2 text-slate-600">Acompanhe o que foi reposto nos pontos de venda.</p>
+  </div>
+  <a routerLink="/painel/reposicoes/nova" class="botao-primario w-auto">Nova reposição</a>
+</div>
 
-<div class="mt-8 grid gap-4 sm:grid-cols-2">
-  <section class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200" aria-labelledby="titulo-marcas">
-    <h2 id="titulo-marcas" class="text-lg font-semibold text-slate-900">Minhas marcas</h2>
+<div class="mt-6">
+  <app-seletor-periodo (periodoAlterado)="alterarPeriodo($event)" />
+</div>
 
-    @if (carregando()) {
-      <p class="mt-3 text-sm text-slate-500" role="status">Carregando...</p>
-    } @else if (falhou()) {
-      <p class="aviso aviso-erro mt-3" role="alert">Não foi possível carregar suas marcas agora.</p>
-    } @else if (resumo(); as dados) {
-      <p class="mt-3 text-3xl font-bold text-slate-900" data-testid="uso-marcas">
-        {{ dados.marcas.length }}<span class="text-lg font-medium text-slate-500">/{{ dados.limite }}</span>
-      </p>
-      <p class="mt-1 text-sm text-slate-600">
-        {{ dados.marcas.length === 0 ? 'Você ainda não criou nenhuma marca.' : 'marcas criadas por você.' }}
-      </p>
+<section class="mt-8" aria-labelledby="titulo-minhas-reposicoes">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <h2 id="titulo-minhas-reposicoes" class="text-xl font-semibold text-slate-900">Minhas reposições</h2>
+    <a routerLink="/painel/reposicoes" class="link-discreto text-sm">Ver todas</a>
+  </div>
+
+  @if (carregandoAutor() && !autor()) {
+    <p class="mt-4 text-sm text-slate-500" role="status" data-testid="carregando-autor">Carregando...</p>
+  } @else if (falhouAutor()) {
+    <div class="aviso aviso-erro mt-4 space-y-3" role="alert" data-testid="erro-autor">
+      <p>Não foi possível carregar as suas reposições.</p>
+      <button type="button" class="botao-secundario" (click)="carregarAutor()">Tentar de novo</button>
+    </div>
+  } @else if (autor(); as painel) {
+    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+      <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+        <p class="text-sm text-slate-500">Reposições no período</p>
+        <p class="mt-1 text-3xl font-bold text-slate-900" data-testid="total-reposicoes">{{ painel.totais.reposicoes }}</p>
+      </div>
+      <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+        <p class="text-sm text-slate-500">Unidades repostas</p>
+        <p class="mt-1 text-3xl font-bold text-slate-900" data-testid="total-unidades">{{ painel.totais.unidades }}</p>
+      </div>
+    </div>
+
+    @if (painel.totais.reposicoes === 0) {
+      <div class="mt-4 rounded-2xl border-2 border-dashed border-slate-300 bg-white p-8 text-center" data-testid="autor-vazio">
+        <p class="text-slate-600">Você não registrou reposições neste período.</p>
+        <a routerLink="/painel/reposicoes/nova" class="botao-secundario mt-4">Registrar uma reposição</a>
+      </div>
+    } @else {
+      <div class="mt-4 grid gap-4 lg:grid-cols-3">
+        <app-ranking titulo="Por marca" [itens]="ranking(painel.porMarca)" unidade="un." />
+        <app-ranking titulo="Por loja" [itens]="ranking(painel.porLoja)" unidade="un." />
+        <app-ranking titulo="Por produto" [itens]="ranking(painel.porProduto)" unidade="un." />
+      </div>
     }
 
-    <a routerLink="/painel/marcas" class="botao-secundario mt-5">Gerenciar marcas</a>
-  </section>
+    @if (painel.ultimas.length > 0) {
+      <div class="mt-4 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+        <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Últimas reposições</h3>
+        <ul class="mt-3 divide-y divide-slate-100">
+          @for (reposicao of painel.ultimas; track reposicao.id) {
+            <li class="flex flex-wrap items-center justify-between gap-2 py-2 text-sm" data-testid="ultima">
+              <span>
+                <span class="font-medium text-slate-800">{{ reposicao.lojaNome }}</span>
+                <span class="text-slate-500"> · {{ reposicao.marcaNome }} · {{ formatarDataHora(reposicao.repostoEm) }}</span>
+              </span>
+              <span class="text-slate-600">{{ reposicao.totalUnidades }} un.</span>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  }
+</section>
 
-  <section class="rounded-2xl bg-slate-100 p-6 ring-1 ring-slate-200" aria-labelledby="titulo-reposicoes">
-    <h2 id="titulo-reposicoes" class="text-lg font-semibold text-slate-900">Reposições</h2>
-    <p class="mt-3 text-sm text-slate-600">
-      Em breve: o registro das reposições nas lojas e os relatórios aparecerão aqui.
-    </p>
-  </section>
-</div>
+<section class="mt-10" aria-labelledby="titulo-minhas-marcas">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <h2 id="titulo-minhas-marcas" class="text-xl font-semibold text-slate-900">Minhas marcas</h2>
+    <a routerLink="/painel/marcas" class="link-discreto text-sm">Gerenciar marcas</a>
+  </div>
+
+  @if (carregandoGestor() && !gestor()) {
+    <p class="mt-4 text-sm text-slate-500" role="status" data-testid="carregando-gestor">Carregando...</p>
+  } @else if (falhouGestor()) {
+    <div class="aviso aviso-erro mt-4 space-y-3" role="alert" data-testid="erro-gestor">
+      <p>Não foi possível carregar as suas marcas.</p>
+      <button type="button" class="botao-secundario" (click)="carregarGestor()">Tentar de novo</button>
+    </div>
+  } @else if (gestor(); as painel) {
+    <p class="mt-1 text-sm text-slate-600" data-testid="uso-marcas">{{ painel.marcas.length }}/{{ painel.limiteMarcas }} marcas</p>
+
+    @if (painel.marcas.length === 0) {
+      <div class="mt-4 rounded-2xl border-2 border-dashed border-slate-300 bg-white p-8 text-center" data-testid="gestor-vazio">
+        <p class="text-slate-600">Você ainda não criou nenhuma marca.</p>
+        <a routerLink="/painel/marcas/nova" class="botao-secundario mt-4">Criar primeira marca</a>
+      </div>
+    } @else {
+      <ul class="mt-4 grid gap-4 sm:grid-cols-2">
+        @for (marca of painel.marcas; track marca.marcaId) {
+          <li class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200" data-testid="marca">
+            <h3 class="text-lg font-semibold text-slate-900">{{ marca.marcaNome }}</h3>
+            <p class="mt-1 text-sm text-slate-600">
+              <strong>{{ marca.totais.reposicoes }}</strong> {{ marca.totais.reposicoes === 1 ? 'reposição' : 'reposições' }} ·
+              <strong>{{ marca.totais.unidades }}</strong> un. no período
+            </p>
+            <p class="mt-2 text-xs text-slate-500" data-testid="uso-da-marca">
+              Lojas {{ marca.uso.lojas }}/{{ marca.uso.limiteLojas }} · Produtos {{ marca.uso.produtos }}/{{ marca.uso.limiteProdutos }} ·
+              Promotores {{ marca.uso.promotores }}/{{ marca.uso.limitePromotores }}
+            </p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <a [routerLink]="['/painel/marcas', marca.marcaId, 'resumo']" class="botao-secundario">Painel da marca</a>
+              <a [routerLink]="['/painel/marcas', marca.marcaId, 'reposicoes']" class="botao-secundario">Reposições</a>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  }
+</section>

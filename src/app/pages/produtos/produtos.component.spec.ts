@@ -11,14 +11,14 @@ import { ProdutosComponent } from './produtos.component';
 
 describe('ProdutosComponent', () => {
   const marca: Marca = { id: 'm1', nome: 'Alfa', descricao: null, criadoEm: '2026-01-01T00:00:00Z' };
-  const sabonete: Produto = { id: 'p1', nome: 'Sabonete', codigo: 'SKU-1', criadoEm: '2026-01-01T00:00:00Z' };
-  const shampoo: Produto = { id: 'p2', nome: 'Shampoo', codigo: null, criadoEm: '2026-01-02T00:00:00Z' };
+  const sabonete: Produto = { id: 'p1', nome: 'Sabonete', codigo: 'SKU-1', ativo: true, criadoEm: '2026-01-01T00:00:00Z' };
+  const shampoo: Produto = { id: 'p2', nome: 'Shampoo', codigo: null, ativo: true, criadoEm: '2026-01-02T00:00:00Z' };
   let fixture: ComponentFixture<ProdutosComponent>;
   let produtoService: jasmine.SpyObj<ProdutoService>;
   let marcaService: jasmine.SpyObj<MarcaService>;
 
   beforeEach(async () => {
-    produtoService = jasmine.createSpyObj<ProdutoService>('ProdutoService', ['listar', 'excluir']);
+    produtoService = jasmine.createSpyObj<ProdutoService>('ProdutoService', ['listar', 'excluir', 'atualizar']);
     marcaService = jasmine.createSpyObj<MarcaService>('MarcaService', ['buscar']);
     marcaService.buscar.and.returnValue(of(marca));
     await TestBed.configureTestingModule({
@@ -67,7 +67,7 @@ describe('ProdutosComponent', () => {
     expect(texto).toContain('Sabonete');
     expect(texto).toContain('Código: SKU-1');
     expect(texto).toContain('Sem código.');
-    expect(elemento().querySelector('[data-testid="uso-produtos"]')?.textContent?.trim()).toBe('2/10 produtos');
+    expect(elemento().querySelector('[data-testid="uso-produtos"]')?.textContent?.trim()).toBe('2/10 produtos ativos');
   });
 
   it('mostra o estado vazio com atalho para cadastrar o primeiro produto', () => {
@@ -139,7 +139,7 @@ describe('ProdutosComponent', () => {
 
   it('exclui o produto confirmado e o remove da lista', () => {
     iniciar({ produtos: [sabonete, shampoo], limite: 10 });
-    produtoService.excluir.and.returnValue(of(undefined));
+    produtoService.excluir.and.returnValue(of(null));
 
     botao('Excluir').click();
     fixture.detectChanges();
@@ -149,7 +149,7 @@ describe('ProdutosComponent', () => {
     expect(produtoService.excluir).toHaveBeenCalledWith('m1', 'p1');
     expect(elemento().textContent).not.toContain('SKU-1');
     expect(elemento().textContent).toContain('Shampoo');
-    expect(elemento().querySelector('[data-testid="uso-produtos"]')?.textContent?.trim()).toBe('1/10 produtos');
+    expect(elemento().querySelector('[data-testid="uso-produtos"]')?.textContent?.trim()).toBe('1/10 produtos ativos');
   });
 
   it('mantém o produto e mostra o erro quando a exclusão falha', () => {
@@ -167,9 +167,64 @@ describe('ProdutosComponent', () => {
     expect(elemento().querySelector('[role="alert"]')?.textContent).toContain('Produto não encontrado.');
   });
 
+  it('conta apenas os produtos ativos no limite e marca os inativos', () => {
+    iniciar({ produtos: [sabonete, { ...shampoo, ativo: false }], limite: 10 });
+
+    expect(elemento().querySelector('[data-testid="uso-produtos"]')?.textContent?.trim()).toBe('1/10 produtos ativos');
+    expect(elemento().querySelectorAll('[data-testid="selo-inativo"]').length).toBe(1);
+    expect(botao('Reativar')).toBeDefined();
+  });
+
+  it('inativa em vez de remover quando a API devolve o produto, e avisa', () => {
+    iniciar({ produtos: [sabonete, shampoo], limite: 10 });
+    produtoService.excluir.and.returnValue(of({ ...sabonete, ativo: false }));
+
+    botao('Excluir').click();
+    fixture.detectChanges();
+    botao('Excluir').click();
+    fixture.detectChanges();
+
+    expect(elemento().textContent).toContain('Sabonete');
+    expect(elemento().querySelector('[data-testid="selo-inativo"]')).not.toBeNull();
+    expect(elemento().querySelector('[data-testid="aviso-inativacao"]')?.textContent).toContain('já tem reposições registradas e foi inativado');
+    expect(elemento().querySelector('[data-testid="uso-produtos"]')?.textContent?.trim()).toBe('1/10 produtos ativos');
+  });
+
+  it('reativa um produto inativo', () => {
+    const inativo = { ...shampoo, ativo: false };
+    iniciar({ produtos: [sabonete, inativo], limite: 10 });
+    produtoService.atualizar.and.returnValue(of({ ...inativo, ativo: true }));
+
+    botao('Reativar').click();
+    fixture.detectChanges();
+
+    expect(produtoService.atualizar).toHaveBeenCalledWith('m1', 'p2', { nome: 'Shampoo', codigo: '', ativo: true });
+    expect(elemento().querySelector('[data-testid="selo-inativo"]')).toBeNull();
+    expect(elemento().querySelector('[data-testid="uso-produtos"]')?.textContent?.trim()).toBe('2/10 produtos ativos');
+  });
+
+  it('não deixa reativar quando o limite de ativos foi atingido', () => {
+    iniciar({ produtos: [sabonete, { ...shampoo, ativo: false }], limite: 1 });
+
+    expect(botao('Reativar').disabled).toBeTrue();
+  });
+
+  it('mostra o erro quando a reativação falha', () => {
+    iniciar({ produtos: [{ ...shampoo, ativo: false }], limite: 10 });
+    produtoService.atualizar.and.returnValue(
+      throwError(() => new HttpErrorResponse({ status: 409, error: { codigo: 'LIMITE_PRODUTOS_ATINGIDO', detail: 'Limite atingido.' } })),
+    );
+
+    botao('Reativar').click();
+    fixture.detectChanges();
+
+    expect(elemento().querySelector('[role="alert"]')?.textContent).toContain('Limite atingido.');
+    expect(elemento().querySelector('[data-testid="selo-inativo"]')).not.toBeNull();
+  });
+
   it('desabilita os botões enquanto exclui', () => {
     iniciar({ produtos: [sabonete], limite: 10 });
-    produtoService.excluir.and.returnValue(new Subject<void>());
+    produtoService.excluir.and.returnValue(new Subject<Produto | null>());
 
     botao('Excluir').click();
     fixture.detectChanges();

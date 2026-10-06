@@ -85,6 +85,10 @@ describe('MarcasComponent', () => {
 
     expect(elemento().querySelector('a[href="/painel/marcas/1/lojas"]')).not.toBeNull();
     expect(elemento().querySelector('a[href="/painel/marcas/1/produtos"]')).not.toBeNull();
+    expect(elemento().querySelector('a[href="/painel/marcas/1/resumo"]')).not.toBeNull();
+    expect(elemento().querySelector('a[href="/painel/marcas/1/promotores"]')).not.toBeNull();
+    expect(elemento().querySelector('a[href="/painel/marcas/1/reposicoes"]')).not.toBeNull();
+    expect(elemento().querySelector('a[href="/painel/relatorios?marca=1"]')).not.toBeNull();
   });
 
   it('mostra erro e permite tentar de novo quando a listagem falha', () => {

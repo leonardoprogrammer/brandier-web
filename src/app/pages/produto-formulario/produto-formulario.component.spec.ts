@@ -8,7 +8,7 @@ import { ProdutoService } from '../../services/produto.service';
 import { ProdutoFormularioComponent } from './produto-formulario.component';
 
 describe('ProdutoFormularioComponent', () => {
-  const produto: Produto = { id: 'p1', nome: 'Sabonete', codigo: 'SKU-1', criadoEm: '2026-01-01T00:00:00Z' };
+  const produto: Produto = { id: 'p1', nome: 'Sabonete', codigo: 'SKU-1', ativo: true, criadoEm: '2026-01-01T00:00:00Z' };
   let fixture: ComponentFixture<ProdutoFormularioComponent>;
   let produtoService: jasmine.SpyObj<ProdutoService>;
   let router: Router;

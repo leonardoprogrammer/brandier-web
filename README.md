@@ -26,7 +26,8 @@ A API fica no repositório `brandier-api`.
 | `/esqueci-senha` | Pede o link de redefinição de senha | Visitante |
 | `/redefinir-senha` | Define a nova senha pelo link recebido | Qualquer |
 | `/sobre` | Sobre o projeto, privacidade e contato | Público |
-| `/painel` | Início do painel, com o resumo de marcas | Autenticado |
+| `/convite` | Abre o convite recebido por e-mail (token na URL, removido ao abrir) | Qualquer |
+| `/painel` | Início do painel: minhas reposições e minhas marcas, com seletor de período | Autenticado |
 | `/painel/marcas` | Lista de marcas, uso do limite e exclusão | Autenticado |
 | `/painel/marcas/nova` | Cria uma marca | Autenticado |
 | `/painel/marcas/:id` | Edita uma marca | Autenticado |
@@ -36,6 +37,14 @@ A API fica no repositório `brandier-api`.
 | `/painel/marcas/:marcaId/produtos` | Catálogo de produtos da marca, uso do limite e exclusão | Autenticado |
 | `/painel/marcas/:marcaId/produtos/novo` | Cadastra um produto | Autenticado |
 | `/painel/marcas/:marcaId/produtos/:id` | Edita um produto | Autenticado |
+| `/painel/marcas/:marcaId/resumo` | Painel da marca: por loja, promotor e produto, e promotores sem atividade | Autenticado |
+| `/painel/relatorios` | Relatório com filtros, ordenação, paginação e exportação em CSV | Autenticado |
+| `/painel/marcas/:marcaId/promotores` | Promotores e convites da marca | Autenticado |
+| `/painel/marcas/:marcaId/reposicoes` | Reposições da marca (gestor vê todas, promotor só as próprias) | Autenticado |
+| `/painel/reposicoes` | Minhas reposições, paginadas | Autenticado |
+| `/painel/reposicoes/nova` | Registra uma reposição | Autenticado |
+| `/painel/reposicoes/:marcaId/:id` | Edita uma reposição (dentro do prazo, para promotores) | Autenticado |
+| `/painel/promotor` | Marcas em que sou promotor e sair delas | Autenticado |
 | `/painel/sobre` | Mesma página Sobre, dentro do painel | Autenticado |
 
 ## Estrutura do código
@@ -108,4 +117,4 @@ A aplicação sobe em `http://localhost:4200`. O arquivo `proxy.conf.json` encam
 npm test -- --watch=false --browsers=ChromeHeadless
 ```
 
-Cobrem validadores, leitura de erros da API, serviço de autenticação, interceptor, guards, as telas de autenticação, a página Sobre, o layout do painel e as telas de marcas, lojas e produtos. O build de produção (`npm run build`) também compila os templates em modo estrito.
+Cobrem validadores, leitura de erros da API, serviço de autenticação, interceptor, guards, as telas de autenticação, a página Sobre, o layout do painel e as telas de marcas, lojas, produtos, promotores, convites e reposições. O build de produção (`npm run build`) também compila os templates em modo estrito.

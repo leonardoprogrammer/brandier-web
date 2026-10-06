@@ -1,0 +1,59 @@
+<div class="flex flex-wrap items-center gap-2" role="group" aria-label="Período">
+  @for (dias of opcoes; track dias) {
+    <button
+      type="button"
+      class="rounded-full px-3 py-1 text-sm font-medium ring-1 ring-slate-300 hover:bg-slate-50"
+      [class.bg-indigo-600]="selecionada() === dias"
+      [class.text-white]="selecionada() === dias"
+      [class.ring-indigo-600]="selecionada() === dias"
+      [class.text-slate-700]="selecionada() !== dias"
+      [attr.aria-pressed]="selecionada() === dias"
+      (click)="escolher(dias)"
+    >
+      {{ dias }} dias
+    </button>
+  }
+  @if (permitirTodo()) {
+    <button
+      type="button"
+      class="rounded-full px-3 py-1 text-sm font-medium ring-1 ring-slate-300 hover:bg-slate-50"
+      [class.bg-indigo-600]="selecionada() === 'todo'"
+      [class.text-white]="selecionada() === 'todo'"
+      [class.ring-indigo-600]="selecionada() === 'todo'"
+      [class.text-slate-700]="selecionada() !== 'todo'"
+      [attr.aria-pressed]="selecionada() === 'todo'"
+      (click)="escolherTodo()"
+    >
+      Todo o período
+    </button>
+  }
+  <button
+    type="button"
+    class="rounded-full px-3 py-1 text-sm font-medium ring-1 ring-slate-300 hover:bg-slate-50"
+    [class.bg-indigo-600]="selecionada() === 'personalizado'"
+    [class.text-white]="selecionada() === 'personalizado'"
+    [class.ring-indigo-600]="selecionada() === 'personalizado'"
+    [class.text-slate-700]="selecionada() !== 'personalizado'"
+    [attr.aria-pressed]="selecionada() === 'personalizado'"
+    (click)="abrirPersonalizado()"
+  >
+    Personalizado
+  </button>
+</div>
+
+@if (selecao() === 'personalizado') {
+  <form class="mt-3 flex flex-wrap items-end gap-3" (submit)="aplicar($event)" novalidate>
+    <div>
+      <label for="periodo-de" class="campo-rotulo">De</label>
+      <input id="periodo-de" type="date" class="campo-entrada" [formControl]="de" [attr.max]="hoje" />
+    </div>
+    <div>
+      <label for="periodo-ate" class="campo-rotulo">Até</label>
+      <input id="periodo-ate" type="date" class="campo-entrada" [formControl]="ate" [attr.max]="hoje" />
+    </div>
+    <button type="submit" class="botao-secundario">Aplicar</button>
+  </form>
+  @if (erro(); as mensagem) {
+    <p class="campo-erro" role="alert">{{ mensagem }}</p>
+  }
+}

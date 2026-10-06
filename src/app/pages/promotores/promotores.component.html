@@ -1,0 +1,187 @@
+<a routerLink="/painel/marcas" class="link-discreto text-sm">&larr; Voltar para marcas</a>
+
+@if (naoEncontrada()) {
+  <div class="aviso aviso-erro mt-6 space-y-3" role="alert">
+    <p>Marca não encontrada.</p>
+    <a routerLink="/painel/marcas" class="botao-secundario">Voltar para marcas</a>
+  </div>
+} @else {
+  <header class="mt-3 flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900">Promotores</h1>
+      <p class="mt-1 text-slate-600">
+        @if (marcaNome()) {
+          Quem pode registrar reposições na marca <strong>{{ marcaNome() }}</strong>.
+        } @else {
+          Quem pode registrar reposições na marca.
+        }
+      </p>
+    </div>
+
+    @if (dados(); as resumo) {
+      <span class="rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700" data-testid="uso-promotores">
+        {{ resumo.usadas }}/{{ resumo.limite }} promotores
+      </span>
+    }
+  </header>
+
+  @if (carregando()) {
+    <p class="mt-6 text-slate-500" role="status">Carregando promotores...</p>
+  } @else if (falhou()) {
+    <div class="aviso aviso-erro mt-6 space-y-3" role="alert">
+      <p>Não foi possível carregar os promotores.</p>
+      <button type="button" class="botao-secundario" (click)="carregar()">Tentar de novo</button>
+    </div>
+  } @else if (dados(); as resumo) {
+    <section class="mt-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200" aria-labelledby="titulo-convidar">
+      <h2 id="titulo-convidar" class="text-lg font-semibold text-slate-900">Convidar promotor</h2>
+      <p class="mt-1 text-sm text-slate-600">
+        A pessoa recebe um e-mail com o convite e precisa de uma conta com esse mesmo e-mail para aceitar. Convites
+        pendentes ocupam uma vaga até serem respondidos ou expirarem.
+      </p>
+
+      @if (atingiuLimite()) {
+        <p id="aviso-limite" class="aviso aviso-atencao mt-4" role="status">
+          Esta marca atingiu o limite de {{ resumo.limite }} promotores (contando convites pendentes). Remova um promotor ou
+          cancele um convite para convidar outra pessoa.
+        </p>
+      } @else {
+        <form class="mt-4 space-y-3" (submit)="convidar($event)" novalidate>
+          <div>
+            <label for="email-convite" class="campo-rotulo">E-mail da pessoa</label>
+            <input
+              id="email-convite"
+              type="email"
+              [formControl]="email"
+              class="campo-entrada"
+              autocomplete="off"
+              inputmode="email"
+              placeholder="pessoa@exemplo.com"
+              [attr.aria-invalid]="mensagemDoEmail() ? 'true' : null"
+              [attr.aria-describedby]="mensagemDoEmail() ? 'email-convite-erro' : null"
+            />
+            @if (mensagemDoEmail(); as mensagem) {
+              <p id="email-convite-erro" class="campo-erro" role="alert">{{ mensagem }}</p>
+            }
+          </div>
+
+          @if (erroConvite(); as mensagem) {
+            <p class="aviso aviso-erro" role="alert">{{ mensagem }}</p>
+          }
+          @if (conviteEnviadoPara(); as destino) {
+            <p class="aviso aviso-sucesso" role="status">Convite enviado para {{ destino }}.</p>
+          }
+
+          <button type="submit" class="botao-primario w-auto" [disabled]="convidando()">
+            {{ convidando() ? 'Enviando...' : 'Enviar convite' }}
+          </button>
+        </form>
+      }
+    </section>
+
+    @if (erroAcao(); as mensagem) {
+      <p class="aviso aviso-erro mt-4" role="alert">{{ mensagem }}</p>
+    }
+
+    <section class="mt-8" aria-labelledby="titulo-promotores">
+      <h2 id="titulo-promotores" class="text-lg font-semibold text-slate-900">Promotores da marca</h2>
+
+      @if (resumo.promotores.length === 0) {
+        <p class="mt-3 rounded-2xl border-2 border-dashed border-slate-300 bg-white p-6 text-center text-slate-600">
+          Esta marca ainda não tem promotores.
+        </p>
+      } @else {
+        <ul class="mt-3 grid gap-3">
+          @for (promotor of resumo.promotores; track promotor.id) {
+            <li class="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200" data-testid="promotor">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p class="font-semibold text-slate-900">{{ promotor.nome }}</p>
+                  <p class="text-sm text-slate-600">{{ promotor.email }}</p>
+                  <p class="text-xs text-slate-500">Desde {{ formatarData(promotor.entrouEm) }}</p>
+                </div>
+
+                @if (confirmando() !== promotor.id) {
+                  <button type="button" class="botao-secundario text-red-700" (click)="pedirConfirmacao(promotor.id)">Remover</button>
+                }
+              </div>
+
+              @if (confirmando() === promotor.id) {
+                <div class="mt-3 space-y-3 rounded-lg border border-red-200 bg-red-50 p-3" role="alertdialog" [attr.aria-label]="'Confirmar remoção de ' + promotor.nome">
+                  <p class="text-sm text-red-800">
+                    Remover <strong>{{ promotor.nome }}</strong> da marca? As reposições já registradas serão mantidas.
+                  </p>
+                  <div class="flex gap-2">
+                    <button type="button" class="botao-secundario" [disabled]="processando() === promotor.id" (click)="cancelarConfirmacao()">Cancelar</button>
+                    <button
+                      type="button"
+                      class="inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+                      [disabled]="processando() === promotor.id"
+                      (click)="removerPromotor(promotor.id)"
+                    >
+                      {{ processando() === promotor.id ? 'Removendo...' : 'Remover promotor' }}
+                    </button>
+                  </div>
+                </div>
+              }
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
+    @if (resumo.convites.length > 0) {
+      <section class="mt-8" aria-labelledby="titulo-convites">
+        <h2 id="titulo-convites" class="text-lg font-semibold text-slate-900">Convites</h2>
+        <ul class="mt-3 grid gap-3">
+          @for (convite of resumo.convites; track convite.id) {
+            <li class="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200" data-testid="convite">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p class="font-medium text-slate-900">{{ convite.email }}</p>
+                  <p class="text-xs text-slate-500">
+                    <span class="font-semibold" data-testid="status-convite">{{ rotuloDoStatus(convite.status) }}</span>
+                    @if (convite.status === 'PENDENTE') {
+                      · expira em {{ formatarData(convite.expiraEm) }}
+                    } @else {
+                      · enviado em {{ formatarData(convite.criadoEm) }}
+                    }
+                  </p>
+                </div>
+
+                @if (confirmando() !== convite.id) {
+                  <button type="button" class="botao-secundario" (click)="pedirConfirmacao(convite.id)">
+                    {{ podeCancelar(convite) ? 'Cancelar convite' : 'Remover da lista' }}
+                  </button>
+                }
+              </div>
+
+              @if (confirmando() === convite.id) {
+                <div class="mt-3 space-y-3 rounded-lg border border-red-200 bg-red-50 p-3" role="alertdialog" [attr.aria-label]="'Confirmar remoção do convite para ' + convite.email">
+                  <p class="text-sm text-red-800">
+                    @if (podeCancelar(convite)) {
+                      Cancelar o convite para <strong>{{ convite.email }}</strong>? O link enviado deixa de funcionar.
+                    } @else {
+                      Remover o convite de <strong>{{ convite.email }}</strong> da lista?
+                    }
+                  </p>
+                  <div class="flex gap-2">
+                    <button type="button" class="botao-secundario" [disabled]="processando() === convite.id" (click)="cancelarConfirmacao()">Voltar</button>
+                    <button
+                      type="button"
+                      class="inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+                      [disabled]="processando() === convite.id"
+                      (click)="removerConvite(convite.id)"
+                    >
+                      {{ processando() === convite.id ? 'Removendo...' : 'Confirmar' }}
+                    </button>
+                  </div>
+                </div>
+              }
+            </li>
+          }
+        </ul>
+      </section>
+    }
+  }
+}

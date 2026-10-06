@@ -25,8 +25,8 @@ export class ProdutoService {
     return this.http.put<Produto>(`${this.url(marcaId)}/${encodeURIComponent(id)}`, dados);
   }
 
-  excluir(marcaId: string, id: string): Observable<void> {
-    return this.http.delete<void>(`${this.url(marcaId)}/${encodeURIComponent(id)}`);
+  excluir(marcaId: string, id: string): Observable<Produto | null> {
+    return this.http.delete<Produto | null>(`${this.url(marcaId)}/${encodeURIComponent(id)}`);
   }
 
   private url(marcaId: string): string {

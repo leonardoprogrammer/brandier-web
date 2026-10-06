@@ -26,9 +26,12 @@ export class ProdutosComponent implements OnInit {
   protected readonly naoEncontrada = signal(false);
   protected readonly confirmandoExclusao = signal<string | null>(null);
   protected readonly excluindo = signal<string | null>(null);
+  protected readonly reativando = signal<string | null>(null);
   protected readonly erroExclusao = signal<string | null>(null);
+  protected readonly avisoInativacao = signal<string | null>(null);
 
-  protected readonly atingiuLimite = computed(() => this.produtos().length >= this.limite());
+  protected readonly ativos = computed(() => this.produtos().filter((produto) => produto.ativo).length);
+  protected readonly atingiuLimite = computed(() => this.ativos() >= this.limite());
 
   ngOnInit(): void {
     this.carregar();
@@ -58,6 +61,7 @@ export class ProdutosComponent implements OnInit {
 
   protected pedirConfirmacao(id: string): void {
     this.erroExclusao.set(null);
+    this.avisoInativacao.set(null);
     this.confirmandoExclusao.set(id);
   }
 
@@ -68,15 +72,40 @@ export class ProdutosComponent implements OnInit {
   protected excluir(produto: Produto): void {
     this.excluindo.set(produto.id);
     this.erroExclusao.set(null);
+    this.avisoInativacao.set(null);
     this.produtoService
       .excluir(this.marcaId, produto.id)
       .pipe(finalize(() => this.excluindo.set(null)))
       .subscribe({
-        next: () => {
-          this.produtos.update((lista) => lista.filter((item) => item.id !== produto.id));
+        next: (inativado) => {
+          if (inativado) {
+            this.substituir(inativado);
+            this.avisoInativacao.set(
+              `O produto ${inativado.nome} já tem reposições registradas e foi inativado em vez de excluído.`,
+            );
+          } else {
+            this.produtos.update((lista) => lista.filter((item) => item.id !== produto.id));
+          }
           this.confirmandoExclusao.set(null);
         },
         error: (erro: unknown) => this.erroExclusao.set(mensagemDeErro(extrairProblema(erro))),
       });
+  }
+
+  protected reativar(produto: Produto): void {
+    this.reativando.set(produto.id);
+    this.erroExclusao.set(null);
+    this.avisoInativacao.set(null);
+    this.produtoService
+      .atualizar(this.marcaId, produto.id, { nome: produto.nome, codigo: produto.codigo ?? '', ativo: true })
+      .pipe(finalize(() => this.reativando.set(null)))
+      .subscribe({
+        next: (reativado) => this.substituir(reativado),
+        error: (erro: unknown) => this.erroExclusao.set(mensagemDeErro(extrairProblema(erro))),
+      });
+  }
+
+  private substituir(atualizado: Produto): void {
+    this.produtos.update((lista) => lista.map((item) => (item.id === atualizado.id ? atualizado : item)));
   }
 }

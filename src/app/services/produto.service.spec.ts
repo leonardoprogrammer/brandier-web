@@ -6,7 +6,7 @@ import { Produto, ProdutosDaMarca } from '../models/produto.model';
 import { ProdutoService } from './produto.service';
 
 describe('ProdutoService', () => {
-  const produto: Produto = { id: 'p1', nome: 'Sabonete', codigo: null, criadoEm: '2026-01-01T12:00:00Z' };
+  const produto: Produto = { id: 'p1', nome: 'Sabonete', codigo: null, ativo: true, criadoEm: '2026-01-01T12:00:00Z' };
   const dados = { nome: 'Sabonete', codigo: '' };
   let service: ProdutoService;
   let http: HttpTestingController;
@@ -63,6 +63,24 @@ describe('ProdutoService', () => {
     const requisicao = http.expectOne('/api/v1/marcas/m1/produtos/p1');
     expect(requisicao.request.method).toBe('DELETE');
     requisicao.flush(null, { status: 204, statusText: 'No Content' });
+  });
+
+  it('excluir devolve o produto inativado quando a API responde 200', () => {
+    let recebido: Produto | null | undefined;
+    service.excluir('m1', 'p1').subscribe((valor) => (recebido = valor));
+
+    http.expectOne('/api/v1/marcas/m1/produtos/p1').flush({ ...produto, ativo: false });
+
+    expect(recebido?.ativo).toBeFalse();
+  });
+
+  it('excluir devolve nulo quando a API responde 204', () => {
+    let recebido: Produto | null | undefined;
+    service.excluir('m1', 'p1').subscribe((valor) => (recebido = valor));
+
+    http.expectOne('/api/v1/marcas/m1/produtos/p1').flush(null, { status: 204, statusText: 'No Content' });
+
+    expect(recebido).toBeNull();
   });
 
   it('codifica os ids na URL', () => {

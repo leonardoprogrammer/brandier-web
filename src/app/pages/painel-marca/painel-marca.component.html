@@ -1,0 +1,82 @@
+<a routerLink="/painel" class="link-discreto text-sm">&larr; Voltar para o painel</a>
+
+@if (naoEncontrada()) {
+  <div class="aviso aviso-erro mt-6 space-y-3" role="alert">
+    <p>Marca não encontrada.</p>
+    <a routerLink="/painel" class="botao-secundario">Voltar para o painel</a>
+  </div>
+} @else {
+  <header class="mt-3 flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900">
+        Painel{{ painel() ? ' de ' + painel()?.marcaNome : ' da marca' }}
+      </h1>
+      <p class="mt-1 text-slate-600">Reposições por loja, promotor e produto no período escolhido.</p>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <a [routerLink]="['/painel/marcas', marcaId, 'reposicoes']" class="botao-secundario">Reposições</a>
+      <a [routerLink]="['/painel/marcas', marcaId, 'promotores']" class="botao-secundario">Promotores</a>
+    </div>
+  </header>
+
+  <div class="mt-6">
+    <app-seletor-periodo (periodoAlterado)="alterarPeriodo($event)" />
+  </div>
+
+  @if (carregando() && !painel()) {
+    <p class="mt-6 text-slate-500" role="status">Carregando...</p>
+  } @else if (falhou()) {
+    <div class="aviso aviso-erro mt-6 space-y-3" role="alert">
+      <p>Não foi possível carregar o painel da marca.</p>
+      <button type="button" class="botao-secundario" (click)="carregar()">Tentar de novo</button>
+    </div>
+  } @else if (painel(); as dados) {
+    <div class="mt-6 grid gap-4 sm:grid-cols-2">
+      <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+        <p class="text-sm text-slate-500">Reposições no período</p>
+        <p class="mt-1 text-3xl font-bold text-slate-900" data-testid="total-reposicoes">{{ dados.totais.reposicoes }}</p>
+      </div>
+      <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+        <p class="text-sm text-slate-500">Unidades repostas</p>
+        <p class="mt-1 text-3xl font-bold text-slate-900" data-testid="total-unidades">{{ dados.totais.unidades }}</p>
+      </div>
+    </div>
+
+    <div class="mt-4 grid gap-4 lg:grid-cols-3">
+      <app-ranking titulo="Por loja" [itens]="ranking(dados.porLoja)" [limite]="10" />
+      <app-ranking titulo="Por promotor" [itens]="ranking(dados.porPromotor)" [limite]="10" />
+      <app-ranking titulo="Por produto" [itens]="ranking(dados.porProduto)" [limite]="10" />
+    </div>
+
+    <section class="mt-6 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-labelledby="titulo-sem-atividade">
+      <h2 id="titulo-sem-atividade" class="text-sm font-semibold uppercase tracking-wide text-slate-500">Promotores sem atividade no período</h2>
+      @if (dados.promotoresSemAtividade.length === 0) {
+        <p class="mt-3 text-sm text-slate-600" data-testid="sem-atividade-vazio">
+          @if (dados.uso.promotores === 0) {
+            Esta marca ainda não tem promotores.
+          } @else {
+            Todos os promotores registraram reposições no período.
+          }
+        </p>
+      } @else {
+        <ul class="mt-3 divide-y divide-slate-100">
+          @for (promotor of dados.promotoresSemAtividade; track promotor.id) {
+            <li class="py-2 text-sm" data-testid="promotor-inativo">
+              <span class="font-medium text-slate-800">{{ promotor.nome }}</span>
+              <span class="text-slate-500"> · {{ promotor.email }} · desde {{ formatarData(promotor.entrouEm) }}</span>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
+    <section class="mt-6 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-labelledby="titulo-uso">
+      <h2 id="titulo-uso" class="text-sm font-semibold uppercase tracking-wide text-slate-500">Uso dos limites</h2>
+      <ul class="mt-3 grid gap-2 text-sm text-slate-700 sm:grid-cols-3" data-testid="uso">
+        <li>Lojas: <strong>{{ dados.uso.lojas }}/{{ dados.uso.limiteLojas }}</strong></li>
+        <li>Produtos ativos: <strong>{{ dados.uso.produtos }}/{{ dados.uso.limiteProdutos }}</strong></li>
+        <li>Promotores: <strong>{{ dados.uso.promotores }}/{{ dados.uso.limitePromotores }}</strong></li>
+      </ul>
+    </section>
+  }
+}
