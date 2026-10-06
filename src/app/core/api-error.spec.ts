@@ -63,6 +63,18 @@ describe('mensagemDeErro', () => {
     expect(mensagemDeErro(problema(400, 'TOKEN_VERIFICACAO_INVALIDO', 'O link expirou.'))).toBe('O link expirou.');
   });
 
+  it('mostra a mensagem de limite de tentativas devolvida pela API', () => {
+    const limite = problema(429, 'MUITAS_TENTATIVAS', 'Muitas tentativas. Tente novamente em 7 minutos.');
+
+    expect(mensagemDeErro(limite)).toBe('Muitas tentativas. Tente novamente em 7 minutos.');
+  });
+
+  it('mostra a mensagem de link de redefinição inválido devolvida pela API', () => {
+    const invalido = problema(400, 'TOKEN_REDEFINICAO_INVALIDO', 'O link de redefinição de senha é inválido, expirou ou já foi utilizado.');
+
+    expect(mensagemDeErro(invalido)).toContain('expirou ou já foi utilizado');
+  });
+
   it('usa mensagem genérica sem detalhe', () => {
     expect(mensagemDeErro(problema(500, null))).toContain('erro inesperado');
   });

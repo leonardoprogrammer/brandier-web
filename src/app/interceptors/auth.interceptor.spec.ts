@@ -86,6 +86,8 @@ describe('authInterceptor', () => {
     '/api/v1/usuario',
     '/api/v1/usuario/verificar-email',
     '/api/v1/usuario/reenviar-verificacao',
+    '/api/v1/usuario/esqueci-senha',
+    '/api/v1/usuario/redefinir-senha',
   ].forEach((url) => {
     it(`não tenta renovar a sessão para ${url}`, () => {
       let falhou = false;

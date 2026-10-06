@@ -43,6 +43,16 @@ export class AuthService {
     return this.http.post<MensagemResposta>(`${this.baseUrl}/reenviar-verificacao`, { email });
   }
 
+  solicitarRedefinicaoSenha(email: string): Observable<MensagemResposta> {
+    return this.http.post<MensagemResposta>(`${this.baseUrl}/esqueci-senha`, { email });
+  }
+
+  redefinirSenha(token: string, senha: string): Observable<MensagemResposta> {
+    return this.http
+      .post<MensagemResposta>(`${this.baseUrl}/redefinir-senha`, { token, senha })
+      .pipe(tap(() => this.usuarioAtual.set(null)));
+  }
+
   sair(): Observable<MensagemResposta> {
     return this.http
       .post<MensagemResposta>(`${this.baseUrl}/logout`, null)

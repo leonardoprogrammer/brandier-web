@@ -1,0 +1,76 @@
+<app-auth-layout
+  [titulo]="concluido() ? 'Senha redefinida' : linkIncompleto() || linkInvalido() ? 'Link inválido' : 'Criar nova senha'"
+  [subtitulo]="concluido() || linkIncompleto() || linkInvalido() ? '' : 'Escolha uma nova senha para a sua conta.'"
+>
+  @if (concluido()) {
+    <div class="space-y-4">
+      <p class="aviso aviso-sucesso" role="status">
+        Senha redefinida com sucesso. Por segurança, você foi desconectado de todos os dispositivos.
+      </p>
+      <a routerLink="/entrar" class="botao-primario">Entrar com a nova senha</a>
+    </div>
+  } @else if (linkIncompleto() || linkInvalido()) {
+    <div class="space-y-4">
+      <p class="aviso aviso-erro" role="alert">
+        {{ linkInvalido() ? erro() : 'O link de redefinição está incompleto.' }}
+      </p>
+      <a routerLink="/esqueci-senha" class="botao-primario">Pedir um novo link</a>
+      <p class="text-center text-sm text-slate-600">
+        <a routerLink="/entrar" class="link-discreto">Voltar para entrar</a>
+      </p>
+    </div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="redefinir()" novalidate class="space-y-4">
+      @if (erro(); as mensagem) {
+        <p class="aviso aviso-erro" role="alert">{{ mensagem }}</p>
+      }
+
+      <div>
+        <label for="senha" class="campo-rotulo">Nova senha</label>
+        <div class="relative">
+          <input
+            id="senha"
+            [type]="mostrarSenha() ? 'text' : 'password'"
+            formControlName="senha"
+            class="campo-entrada pr-20"
+            autocomplete="new-password"
+            aria-describedby="senha-requisitos"
+            [attr.aria-invalid]="mensagemDoCampo('senha') ? 'true' : null"
+          />
+          <button
+            type="button"
+            class="absolute inset-y-0 right-0 rounded-r-lg px-3 text-sm font-medium text-slate-600 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600/40"
+            [attr.aria-pressed]="mostrarSenha()"
+            (click)="alternarSenha()"
+          >
+            {{ mostrarSenha() ? 'Ocultar' : 'Mostrar' }}
+          </button>
+        </div>
+        <app-senha-requisitos [senha]="senhaDigitada()" />
+        @if (mensagemDoCampo('senha'); as mensagem) {
+          <p class="campo-erro" role="alert">{{ mensagem }}</p>
+        }
+      </div>
+
+      <div>
+        <label for="confirmarSenha" class="campo-rotulo">Confirmar nova senha</label>
+        <input
+          id="confirmarSenha"
+          [type]="mostrarSenha() ? 'text' : 'password'"
+          formControlName="confirmarSenha"
+          class="campo-entrada"
+          autocomplete="new-password"
+          [attr.aria-invalid]="mensagemDoCampo('confirmarSenha') ? 'true' : null"
+          [attr.aria-describedby]="mensagemDoCampo('confirmarSenha') ? 'confirmar-erro' : null"
+        />
+        @if (mensagemDoCampo('confirmarSenha'); as mensagem) {
+          <p id="confirmar-erro" class="campo-erro" role="alert">{{ mensagem }}</p>
+        }
+      </div>
+
+      <button type="submit" class="botao-primario" [disabled]="enviando()">
+        {{ enviando() ? 'Salvando...' : 'Redefinir senha' }}
+      </button>
+    </form>
+  }
+</app-auth-layout>

@@ -53,6 +53,17 @@ describe('EntrarComponent', () => {
     expect(elemento().querySelector('a[href="/cadastro"]')).not.toBeNull();
   });
 
+  it('oferece o caminho para redefinir a senha', () => {
+    const link = elemento().querySelector('a[href="/esqueci-senha"]');
+
+    expect(link).not.toBeNull();
+    expect(link!.textContent).toContain('Esqueci minha senha');
+  });
+
+  it('tem o link para a página Sobre no rodapé', () => {
+    expect(elemento().querySelector('a[href="/sobre"]')).not.toBeNull();
+  });
+
   it('não envia e mostra os erros quando o formulário está vazio', () => {
     enviar();
 

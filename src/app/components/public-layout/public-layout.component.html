@@ -1,0 +1,24 @@
+<div class="flex min-h-screen flex-col">
+  <header class="border-b border-slate-200 bg-white">
+    <div class="mx-auto flex max-w-3xl items-center justify-between px-4 py-4">
+      <a routerLink="/" class="flex items-center gap-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600/40" aria-label="Brandier, página inicial">
+        <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-lg font-bold text-white" aria-hidden="true">B</span>
+        <span class="text-xl font-bold tracking-tight text-slate-900">Brandier</span>
+      </a>
+      <nav class="flex items-center gap-4 text-sm" aria-label="Acesso">
+        <a routerLink="/entrar" class="link-discreto">Entrar</a>
+        <a routerLink="/cadastro" class="botao-secundario">Criar conta</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="mx-auto w-full max-w-3xl flex-1 px-4 py-10">
+    <ng-content />
+  </main>
+
+  <footer class="border-t border-slate-200 bg-white">
+    <div class="mx-auto max-w-3xl px-4 py-6 text-center text-xs text-slate-500">
+      Projeto de portfólio, não é para uso comercial.
+    </div>
+  </footer>
+</div>

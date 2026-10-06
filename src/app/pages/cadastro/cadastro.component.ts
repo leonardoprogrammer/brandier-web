@@ -1,10 +1,11 @@
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { AuthLayoutComponent } from '../../components/auth-layout/auth-layout.component';
+import { SenhaRequisitosComponent } from '../../components/senha-requisitos/senha-requisitos.component';
 import { extrairProblema, mensagemDeErro } from '../../core/api-error';
 import { AuthService } from '../../services/auth.service';
 import {
@@ -21,7 +22,7 @@ const SEGUNDOS_ENTRE_REENVIOS = 60;
 
 @Component({
   selector: 'app-cadastro',
-  imports: [ReactiveFormsModule, RouterLink, AuthLayoutComponent],
+  imports: [ReactiveFormsModule, RouterLink, AuthLayoutComponent, SenhaRequisitosComponent],
   templateUrl: './cadastro.component.html',
 })
 export class CadastroComponent {
@@ -49,16 +50,7 @@ export class CadastroComponent {
     { validators: senhasIguais('senha', 'confirmarSenha') },
   );
 
-  private readonly senhaDigitada = toSignal(this.form.controls.senha.valueChanges, { initialValue: '' });
-
-  protected readonly requisitosDaSenha = computed(() => {
-    const senha = this.senhaDigitada();
-    return [
-      { descricao: `Mínimo de ${SENHA_TAMANHO_MINIMO} caracteres`, atendido: senha.length >= SENHA_TAMANHO_MINIMO },
-      { descricao: 'Pelo menos uma letra', atendido: /\p{L}/u.test(senha) },
-      { descricao: 'Pelo menos um número', atendido: /\d/.test(senha) },
-    ];
-  });
+  protected readonly senhaDigitada = toSignal(this.form.controls.senha.valueChanges, { initialValue: '' });
 
   protected readonly enviando = signal(false);
   protected readonly erro = signal<string | null>(null);

@@ -84,6 +84,39 @@ describe('AuthService', () => {
     requisicao.flush({ message: 'ok' });
   });
 
+  it('solicitarRedefinicaoSenha envia o e-mail para esqueci-senha', () => {
+    service.solicitarRedefinicaoSenha('pessoa@exemplo.com').subscribe();
+
+    const requisicao = http.expectOne('/api/v1/usuario/esqueci-senha');
+    expect(requisicao.request.method).toBe('POST');
+    expect(requisicao.request.body).toEqual({ email: 'pessoa@exemplo.com' });
+    requisicao.flush({ message: 'ok' });
+  });
+
+  it('redefinirSenha envia token e senha e encerra a sessão local', () => {
+    service.entrar('pessoa@exemplo.com', 'Senha1234').subscribe();
+    http.expectOne('/api/v1/usuario/login').flush(usuario);
+    expect(service.autenticado()).toBeTrue();
+
+    service.redefinirSenha('abc', 'NovaSenha123').subscribe();
+
+    const requisicao = http.expectOne('/api/v1/usuario/redefinir-senha');
+    expect(requisicao.request.method).toBe('POST');
+    expect(requisicao.request.body).toEqual({ token: 'abc', senha: 'NovaSenha123' });
+    requisicao.flush({ message: 'ok' });
+    expect(service.autenticado()).toBeFalse();
+  });
+
+  it('redefinirSenha mantém a sessão local quando a API recusa', () => {
+    service.entrar('pessoa@exemplo.com', 'Senha1234').subscribe();
+    http.expectOne('/api/v1/usuario/login').flush(usuario);
+
+    service.redefinirSenha('ruim', 'NovaSenha123').subscribe({ error: () => undefined });
+    http.expectOne('/api/v1/usuario/redefinir-senha').flush({ codigo: 'TOKEN_REDEFINICAO_INVALIDO' }, { status: 400, statusText: 'x' });
+
+    expect(service.autenticado()).toBeTrue();
+  });
+
   it('sair limpa o usuário mesmo quando a API falha', () => {
     service.entrar('pessoa@exemplo.com', 'Senha1234').subscribe();
     http.expectOne('/api/v1/usuario/login').flush(usuario);

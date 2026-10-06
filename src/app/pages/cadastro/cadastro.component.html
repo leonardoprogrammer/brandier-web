@@ -98,15 +98,7 @@
             {{ mostrarSenha() ? 'Ocultar' : 'Mostrar' }}
           </button>
         </div>
-        <ul id="senha-requisitos" class="mt-2 space-y-0.5 text-xs">
-          @for (requisito of requisitosDaSenha(); track requisito.descricao) {
-            <li [class]="requisito.atendido ? 'text-emerald-700' : 'text-slate-500'">
-              <span aria-hidden="true">{{ requisito.atendido ? '✓' : '•' }}</span>
-              {{ requisito.descricao }}
-              <span class="sr-only">{{ requisito.atendido ? '(atendido)' : '(pendente)' }}</span>
-            </li>
-          }
-        </ul>
+        <app-senha-requisitos [senha]="senhaDigitada()" />
         @if (mensagemDoCampo('senha'); as mensagem) {
           <p class="campo-erro" role="alert">{{ mensagem }}</p>
         }
@@ -139,8 +131,10 @@
             [attr.aria-describedby]="mensagemDoCampo('aceitouTermos') ? 'termos-erro' : null"
           />
           <label for="aceitouTermos" class="text-sm text-slate-700">
-            Entendo que o Brandier é um projeto de portfólio, de uso não comercial, e concordo que meu nome e meu
-            e-mail sejam armazenados para o funcionamento da conta.
+            Li e concordo com os termos descritos em
+            <a routerLink="/sobre" target="_blank" rel="noopener" class="link-discreto">Sobre o projeto</a>:
+            o Brandier é um projeto de portfólio, de uso não comercial, e meu nome e meu e-mail serão armazenados
+            para o funcionamento da conta.
           </label>
         </div>
         @if (mensagemDoCampo('aceitouTermos'); as mensagem) {

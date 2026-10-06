@@ -1,0 +1,76 @@
+<app-public-layout>
+  <article class="space-y-10">
+    <header>
+      <h1 class="text-3xl font-bold tracking-tight text-slate-900">Sobre o projeto</h1>
+      <p class="mt-3 text-lg text-slate-600">
+        O Brandier é uma plataforma de gestão de promotores de marca: o gestor cadastra lojas e produtos, convida
+        promotores e acompanha as reposições que eles registram nos pontos de venda.
+      </p>
+    </header>
+
+    <section aria-labelledby="portfolio">
+      <h2 id="portfolio" class="text-xl font-semibold text-slate-900">Um projeto de portfólio</h2>
+      <div class="mt-3 space-y-3 text-slate-700">
+        <p>
+          Este sistema foi criado por mim (<strong>{{ autor.nome }}</strong>) para demonstrar, na prática, o trabalho como
+          engenheiro de software: arquitetura, segurança, testes e entrega.
+        </p>
+        <p class="aviso aviso-atencao">
+          <strong>A aplicação que está no ar não é para uso comercial.</strong> É uma demonstração, sem garantia de
+          disponibilidade, e contas e dados podem ser apagados a qualquer momento.
+        </p>
+      </div>
+    </section>
+
+    <section aria-labelledby="limites">
+      <h2 id="limites" class="text-xl font-semibold text-slate-900">Limites da demonstração</h2>
+      <p class="mt-3 text-slate-700">
+        Para manter a demonstração leve, o projeto tem limites de uso: até 2 marcas por conta, 5 promotores e 5 lojas
+        por marca, e 10 produtos por marca.
+      </p>
+    </section>
+
+    <section aria-labelledby="privacidade">
+      <h2 id="privacidade" class="text-xl font-semibold text-slate-900">Seus dados e privacidade</h2>
+      <div class="mt-3 space-y-3 text-slate-700">
+        <p>Ao criar uma conta, o Brandier guarda apenas o necessário para o funcionamento dela:</p>
+        <ul class="list-disc space-y-1 pl-5">
+          <li>seu <strong>nome</strong> e seu <strong>e-mail</strong>;</li>
+          <li>a sua <strong>senha</strong>, armazenada criptografada (hash), nunca em texto legível;</li>
+          <li>a <strong>data em que você aceitou</strong> estes termos.</li>
+        </ul>
+        <p>
+          Os dados servem só para autenticação e para o uso da plataforma, e não são vendidos nem compartilhados. O site
+          usa apenas cookies essenciais, para manter você conectado e proteger as requisições.
+        </p>
+        <p>
+          Contas cujo e-mail não for verificado em 7 dias são apagadas automaticamente. Evite informar dados
+          sensíveis: este é um ambiente de demonstração.
+        </p>
+        <p>
+          <strong>Quer apagar seus dados?</strong> Envie um e-mail para
+          <a [href]="'mailto:' + autor.emailContato" class="link-discreto">{{ autor.emailContato }}</a>
+          a partir do endereço da sua conta (ou informando o e-mail cadastrado) e a conta será removida.
+        </p>
+      </div>
+    </section>
+
+    <section aria-labelledby="autor">
+      <h2 id="autor" class="text-xl font-semibold text-slate-900">Sobre mim</h2>
+      <p class="mt-3 text-slate-700">
+        Quer conhecer o meu trabalho ou falar comigo? Estes são os meus canais:
+      </p>
+      <ul class="mt-3 flex flex-wrap gap-3">
+        <li>
+          <a [href]="autor.curriculo" target="_blank" rel="noopener noreferrer" class="botao-secundario">Currículo online</a>
+        </li>
+        <li>
+          <a [href]="autor.github" target="_blank" rel="noopener noreferrer" class="botao-secundario">GitHub</a>
+        </li>
+        <li>
+          <a [href]="autor.linkedin" target="_blank" rel="noopener noreferrer" class="botao-secundario">LinkedIn</a>
+        </li>
+      </ul>
+    </section>
+  </article>
+</app-public-layout>

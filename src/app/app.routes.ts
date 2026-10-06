@@ -17,6 +17,24 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/cadastro/cadastro.component').then((m) => m.CadastroComponent),
   },
   {
+    path: 'esqueci-senha',
+    title: 'Esqueci minha senha - Brandier',
+    canActivate: [guestGuard],
+    loadComponent: () =>
+      import('./pages/esqueci-senha/esqueci-senha.component').then((m) => m.EsqueciSenhaComponent),
+  },
+  {
+    path: 'redefinir-senha',
+    title: 'Redefinir senha - Brandier',
+    loadComponent: () =>
+      import('./pages/redefinir-senha/redefinir-senha.component').then((m) => m.RedefinirSenhaComponent),
+  },
+  {
+    path: 'sobre',
+    title: 'Sobre o projeto - Brandier',
+    loadComponent: () => import('./pages/sobre/sobre.component').then((m) => m.SobreComponent),
+  },
+  {
     path: 'verificar-email',
     title: 'Verificar e-mail - Brandier',
     loadComponent: () =>

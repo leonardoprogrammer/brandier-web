@@ -49,6 +49,15 @@ describe('CadastroComponent', () => {
     fixture.detectChanges();
   }
 
+  it('liga os termos à página Sobre, abrindo em nova aba', () => {
+    const link = elemento().querySelector<HTMLAnchorElement>('label[for="aceitouTermos"] a');
+
+    expect(link).not.toBeNull();
+    expect(link!.getAttribute('href')).toBe('/sobre');
+    expect(link!.target).toBe('_blank');
+    expect(link!.rel).toContain('noopener');
+  });
+
   it('não envia e mostra os erros quando o formulário está vazio', () => {
     enviar();
 

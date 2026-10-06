@@ -12,6 +12,8 @@ const ROTAS_SEM_RENOVACAO = [
   '/usuario',
   '/usuario/verificar-email',
   '/usuario/reenviar-verificacao',
+  '/usuario/esqueci-senha',
+  '/usuario/redefinir-senha',
 ];
 
 function ehRotaSemRenovacao(url: string): boolean {

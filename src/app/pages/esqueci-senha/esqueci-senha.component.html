@@ -1,0 +1,51 @@
+<app-auth-layout
+  [titulo]="concluido() ? 'Verifique seu e-mail' : 'Esqueci minha senha'"
+  [subtitulo]="concluido() ? '' : 'Informe o e-mail da sua conta e enviaremos um link para criar uma nova senha.'"
+>
+  @if (concluido()) {
+    <div class="space-y-4">
+      <p class="aviso aviso-sucesso" role="status">
+        Se <strong class="break-all">{{ emailInformado() }}</strong> estiver cadastrado, você receberá em instantes um
+        link para redefinir a senha. O link vale por 30 minutos.
+      </p>
+      <p class="text-sm text-slate-600">Não encontrou a mensagem? Confira também a caixa de spam.</p>
+      <button type="button" class="botao-secundario w-full" (click)="tentarOutroEmail()">Usar outro e-mail</button>
+      <p class="text-center text-sm text-slate-600">
+        <a routerLink="/entrar" class="link-discreto">Voltar para entrar</a>
+      </p>
+    </div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="solicitar()" novalidate class="space-y-4">
+      @if (erro(); as mensagem) {
+        <p class="aviso aviso-erro" role="alert">{{ mensagem }}</p>
+      }
+
+      <div>
+        <label for="email" class="campo-rotulo">E-mail</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          class="campo-entrada"
+          autocomplete="email"
+          inputmode="email"
+          placeholder="voce@exemplo.com"
+          [attr.aria-invalid]="mensagemDoEmail() ? 'true' : null"
+          [attr.aria-describedby]="mensagemDoEmail() ? 'email-erro' : null"
+        />
+        @if (mensagemDoEmail(); as mensagem) {
+          <p id="email-erro" class="campo-erro" role="alert">{{ mensagem }}</p>
+        }
+      </div>
+
+      <button type="submit" class="botao-primario" [disabled]="enviando()">
+        {{ enviando() ? 'Enviando...' : 'Enviar link' }}
+      </button>
+    </form>
+
+    <p class="mt-6 text-center text-sm text-slate-600">
+      Lembrou a senha?
+      <a routerLink="/entrar" class="link-discreto">Entrar</a>
+    </p>
+  }
+</app-auth-layout>
