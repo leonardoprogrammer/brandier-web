@@ -1,0 +1,59 @@
+<app-auth-layout
+  [titulo]="estado() === 'sucesso' ? 'E-mail verificado' : estado() === 'erro' ? 'Não foi possível verificar' : 'Verificando seu e-mail'"
+>
+  @switch (estado()) {
+    @case ('verificando') {
+      <p class="flex items-center gap-3 text-slate-700" role="status">
+        <span class="h-5 w-5 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" aria-hidden="true"></span>
+        Confirmando seu e-mail, aguarde um instante...
+      </p>
+    }
+    @case ('sucesso') {
+      <div class="space-y-4">
+        <p class="aviso aviso-sucesso" role="status">{{ mensagem() }}</p>
+        <a routerLink="/entrar" class="botao-primario">Entrar</a>
+      </div>
+    }
+    @case ('erro') {
+      <div class="space-y-4">
+        <p class="aviso aviso-erro" role="alert">{{ mensagem() }}</p>
+
+        @if (reenvioConfirmado()) {
+          <p class="aviso aviso-sucesso" role="status">
+            Se o e-mail puder ser usado, enviaremos um novo link. Confira sua caixa de entrada.
+          </p>
+        } @else {
+          <form class="space-y-3" (submit)="reenviar($event)" novalidate>
+            <div>
+              <label for="email" class="campo-rotulo">Receber um novo link</label>
+              <input
+                id="email"
+                type="email"
+                [formControl]="email"
+                class="campo-entrada"
+                autocomplete="email"
+                inputmode="email"
+                placeholder="voce@exemplo.com"
+                [attr.aria-invalid]="mensagemDoEmail() ? 'true' : null"
+                [attr.aria-describedby]="mensagemDoEmail() ? 'email-erro' : null"
+              />
+              @if (mensagemDoEmail(); as mensagemCampo) {
+                <p id="email-erro" class="campo-erro" role="alert">{{ mensagemCampo }}</p>
+              }
+            </div>
+            @if (erroReenvio(); as mensagemErro) {
+              <p class="aviso aviso-erro" role="alert">{{ mensagemErro }}</p>
+            }
+            <button type="submit" class="botao-primario" [disabled]="reenviando()">
+              {{ reenviando() ? 'Enviando...' : 'Reenviar link de verificação' }}
+            </button>
+          </form>
+        }
+
+        <p class="text-center text-sm text-slate-600">
+          <a routerLink="/entrar" class="link-discreto">Voltar para entrar</a>
+        </p>
+      </div>
+    }
+  }
+</app-auth-layout>
