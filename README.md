@@ -6,6 +6,24 @@ Front-end da **Brandier**, uma plataforma de gestão de promotores de marca: o g
 
 A API fica no repositório `brandier-api`.
 
+## Capturas de tela
+
+| Entrar | Criar conta |
+|---|---|
+| ![Tela de entrar](docs/screenshots/entrar.jpg) | ![Tela de criar conta](docs/screenshots/cadastro.jpg) |
+
+| Como funciona | Sobre o projeto |
+|---|---|
+| ![Tela Como funciona](docs/screenshots/como-funciona.jpg) | ![Tela Sobre o projeto](docs/screenshots/sobre.jpg) |
+
+| Painel (início) | Marcas |
+|---|---|
+| ![Painel inicial](docs/screenshots/painel-inicio.jpg) | ![Lista de marcas](docs/screenshots/marcas.jpg) |
+
+| Relatórios |
+|---|
+| ![Relatório de reposições](docs/screenshots/relatorios.jpg) |
+
 ## Tecnologias
 
 | Área | O que é usado |
@@ -20,8 +38,9 @@ A API fica no repositório `brandier-api`.
 
 | Rota | Tela | Acesso |
 |---|---|---|
-| `/entrar` | Login, com link para recuperar a senha | Visitante |
+| `/entrar` | Login (e-mail/senha ou Google), com link para recuperar a senha | Visitante |
 | `/cadastro` | Criação de conta, com aceite dos termos | Visitante |
+| `/aceitar-termos` | Aceite dos termos para quem entrou pela primeira vez com o Google | Autenticado, termos pendentes |
 | `/verificar-email` | Confirma o e-mail pelo link recebido | Qualquer |
 | `/esqueci-senha` | Pede o link de redefinição de senha | Visitante |
 | `/redefinir-senha` | Define a nova senha pelo link recebido | Qualquer |
@@ -47,7 +66,7 @@ A API fica no repositório `brandier-api`.
 | `/painel/reposicoes/:marcaId/:id` | Edita uma reposição (dentro do prazo, para promotores) | Autenticado |
 | `/painel/promotor` | Convites recebidos, marcas em que sou promotor e sair delas | Autenticado |
 | `/painel/como-funciona` | Mesma página Como funciona, dentro do painel | Autenticado |
-| `/painel/conta` | Minha conta: editar nome, alterar senha e exclusão da conta (com senha) | Autenticado |
+| `/painel/conta` | Minha conta: editar nome, alterar/definir senha e exclusão da conta (em acordeão) | Autenticado |
 | `/painel/sobre` | Mesma página Sobre, dentro do painel | Autenticado |
 
 ## Estrutura do código
@@ -85,6 +104,12 @@ Em `src/app`:
 - Os *guards* só consultam a sessão no navegador (no servidor, deixam passar), porque os cookies `HttpOnly` não são legíveis pelo JavaScript.
 - O token dos links de e-mail é **removido da barra de endereço** assim que a tela carrega, e o `index.html` define a política de *referrer* como `same-origin`.
 
+### Login com Google
+
+- O botão "Entrar com o Google" (`app-google-button`) só aparece quando `googleClientId` está preenchido em `environment*.ts`; carrega o script do Google Identity Services sob demanda, uma única vez (mesmo padrão do Turnstile).
+- Entrar com uma conta sem senha ainda definida (criada antes pelo Google) mostra uma mensagem explicando para usar o Google ou "Esqueci minha senha", em vez do erro genérico de credenciais.
+- Contas novas pelo Google ainda não aceitaram os termos: o `authGuard` redireciona qualquer rota do painel para `/aceitar-termos` enquanto isso, com um botão para sair sem aceitar.
+
 ### Tema
 
 - Três opções — **Claro**, **Escuro** e **Sistema** (padrão) — no seletor `app-tema-toggle`, presente nos três layouts (painel, público e de autenticação). `TemaService` guarda a escolha em `localStorage` (`brandier-tema`) e aplica a classe `dark` em `<html>`; com "Sistema", acompanha `prefers-color-scheme` e reage a mudanças em tempo real. Tailwind usa `darkMode: 'class'`; as classes de componente (`campo-entrada`, `botao-primario`, `aviso-*`…) em `styles.scss` já têm as variantes `dark:`. Um script inline no `index.html` lê o `localStorage` antes do Angular iniciar, para não piscar o tema errado.
@@ -117,6 +142,7 @@ A aplicação sobe em `http://localhost:4200`. O arquivo `proxy.conf.json` encam
 
 - `src/environments/environment*.ts`: contém só valores **públicos** (`apiUrl: '/api/v1'`). Tudo que vai nesses arquivos é entregue ao navegador, então **nenhum segredo** deve ficar ali.
 - `turnstileSiteKey` (nos mesmos arquivos): a **chave pública** do Cloudflare Turnstile. Vazia, o widget não aparece no cadastro; preenchida, o cadastro passa a exigir a verificação (e a API precisa ter `brandier.turnstile.enabled=true` com a chave secreta correspondente, que nunca vai para o front).
+- `googleClientId` (nos mesmos arquivos): o **Client ID público** do Google (OAuth, tipo "Web application", sem *client secret*). Vazio, o botão de entrar com o Google não aparece; preenchido, a API precisa ter o mesmo valor em `brandier.google.client-id`.
 - `.env.example`: variáveis do processo Node do SSR (`PORT`). O `.env` real não é versionado.
 
 ## Testes
