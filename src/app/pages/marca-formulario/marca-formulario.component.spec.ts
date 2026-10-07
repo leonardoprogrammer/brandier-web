@@ -8,7 +8,7 @@ import { MarcaService } from '../../services/marca.service';
 import { MarcaFormularioComponent } from './marca-formulario.component';
 
 describe('MarcaFormularioComponent', () => {
-  const marca: Marca = { id: 'abc', nome: 'Alfa', descricao: 'Texto', criadoEm: '2026-01-01T00:00:00Z' };
+  const marca: Marca = { id: 'abc', nome: 'Alfa', descricao: 'Texto', ativa: true, criadoEm: '2026-01-01T00:00:00Z' };
   let fixture: ComponentFixture<MarcaFormularioComponent>;
   let marcaService: jasmine.SpyObj<MarcaService>;
   let router: Router;

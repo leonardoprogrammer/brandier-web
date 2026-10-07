@@ -8,8 +8,8 @@ import { MarcaService } from '../../services/marca.service';
 import { MarcasComponent } from './marcas.component';
 
 describe('MarcasComponent', () => {
-  const alfa: Marca = { id: '1', nome: 'Alfa', descricao: 'Descrição da Alfa', criadoEm: '2026-01-15T12:00:00Z' };
-  const beta: Marca = { id: '2', nome: 'Beta', descricao: null, criadoEm: '2026-02-20T12:00:00Z' };
+  const alfa: Marca = { id: '1', nome: 'Alfa', descricao: 'Descrição da Alfa', ativa: true, criadoEm: '2026-01-15T12:00:00Z' };
+  const beta: Marca = { id: '2', nome: 'Beta', descricao: null, ativa: true, criadoEm: '2026-02-20T12:00:00Z' };
   let fixture: ComponentFixture<MarcasComponent>;
   let marcaService: jasmine.SpyObj<MarcaService>;
 

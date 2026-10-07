@@ -2,6 +2,7 @@ export interface Marca {
   id: string;
   nome: string;
   descricao: string | null;
+  ativa: boolean;
   criadoEm: string;
 }
 

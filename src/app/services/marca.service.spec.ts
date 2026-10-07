@@ -6,7 +6,7 @@ import { Marca, MinhasMarcas } from '../models/marca.model';
 import { MarcaService } from './marca.service';
 
 describe('MarcaService', () => {
-  const marca: Marca = { id: 'abc', nome: 'Alfa', descricao: null, criadoEm: '2026-01-01T12:00:00Z' };
+  const marca: Marca = { id: 'abc', nome: 'Alfa', descricao: null, ativa: true, criadoEm: '2026-01-01T12:00:00Z' };
   let service: MarcaService;
   let http: HttpTestingController;
 

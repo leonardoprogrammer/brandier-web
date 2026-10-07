@@ -10,7 +10,7 @@ import { MarcaService } from '../../services/marca.service';
 import { LojasComponent } from './lojas.component';
 
 describe('LojasComponent', () => {
-  const marca: Marca = { id: 'm1', nome: 'Alfa', descricao: null, criadoEm: '2026-01-01T00:00:00Z' };
+  const marca: Marca = { id: 'm1', nome: 'Alfa', descricao: null, ativa: true, criadoEm: '2026-01-01T00:00:00Z' };
   const centro: Loja = { id: 'l1', nome: 'Centro', cidade: 'Campinas', uf: 'SP', endereco: 'Rua A, 1', criadoEm: '2026-01-01T00:00:00Z' };
   const norte: Loja = { id: 'l2', nome: 'Norte', cidade: 'Santos', uf: 'SP', endereco: null, criadoEm: '2026-01-02T00:00:00Z' };
   let fixture: ComponentFixture<LojasComponent>;

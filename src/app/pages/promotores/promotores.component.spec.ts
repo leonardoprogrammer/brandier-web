@@ -11,7 +11,7 @@ import { PromotorService } from '../../services/promotor.service';
 import { PromotoresComponent } from './promotores.component';
 
 describe('PromotoresComponent', () => {
-  const marca: Marca = { id: 'm1', nome: 'Alfa', descricao: null, criadoEm: '2026-01-01T00:00:00Z' };
+  const marca: Marca = { id: 'm1', nome: 'Alfa', descricao: null, ativa: true, criadoEm: '2026-01-01T00:00:00Z' };
   const ana = { id: 'p1', usuarioId: 'u1', nome: 'Ana', email: 'ana@exemplo.com', entrouEm: '2026-02-01T12:00:00Z' };
   const pendente: Convite = { id: 'c1', email: 'novo@exemplo.com', status: 'PENDENTE', expiraEm: '2026-03-08T12:00:00Z', criadoEm: '2026-03-01T12:00:00Z' };
   const recusado: Convite = { id: 'c2', email: 'nao@exemplo.com', status: 'RECUSADO', expiraEm: '2026-03-08T12:00:00Z', criadoEm: '2026-03-01T12:00:00Z' };

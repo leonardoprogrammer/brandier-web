@@ -34,6 +34,7 @@ export interface VinculoPromotor {
   marcaId: string;
   marcaNome: string;
   gestorNome: string;
+  marcaAtiva: boolean;
   entrouEm: string;
 }
 

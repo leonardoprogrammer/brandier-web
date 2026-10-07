@@ -16,7 +16,11 @@ describe('CadastroComponent', () => {
     auth = jasmine.createSpyObj<AuthService>('AuthService', ['cadastrar', 'reenviarVerificacao']);
     await TestBed.configureTestingModule({
       imports: [CadastroComponent],
-      providers: [provideRouter([]), { provide: AuthService, useValue: auth }],
+      providers: [
+        provideRouter([]),
+        { provide: AuthService, useValue: auth },
+        { provide: CHAVE_DO_TURNSTILE, useValue: '' },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(CadastroComponent);

@@ -9,8 +9,8 @@ import { PromotorService } from '../../services/promotor.service';
 import { PromotorVinculosComponent } from './promotor-vinculos.component';
 
 describe('PromotorVinculosComponent', () => {
-  const alfa: VinculoPromotor = { marcaId: 'm1', marcaNome: 'Alfa', gestorNome: 'Gestor Silva', entrouEm: '2026-02-01T12:00:00Z' };
-  const beta: VinculoPromotor = { marcaId: 'm2', marcaNome: 'Beta', gestorNome: 'Outra Gestora', entrouEm: '2026-02-02T12:00:00Z' };
+  const alfa: VinculoPromotor = { marcaId: 'm1', marcaNome: 'Alfa', gestorNome: 'Gestor Silva', marcaAtiva: true, entrouEm: '2026-02-01T12:00:00Z' };
+  const beta: VinculoPromotor = { marcaId: 'm2', marcaNome: 'Beta', gestorNome: 'Outra Gestora', marcaAtiva: true, entrouEm: '2026-02-02T12:00:00Z' };
   let fixture: ComponentFixture<PromotorVinculosComponent>;
   const convitePendente = (id: string, marcaNome: string) => ({
     id,
@@ -80,7 +80,7 @@ describe('PromotorVinculosComponent', () => {
 
   it('recarrega as marcas depois de aceitar um convite, mas não depois de recusar', () => {
     conviteService.recebidos.and.returnValue(of({ convites: [convitePendente('c1', 'Gama'), convitePendente('c2', 'Delta')] }));
-    conviteService.aceitarPorId.and.returnValue(of({ marcaId: 'm4', marcaNome: 'Delta', gestorNome: 'Gestor', entrouEm: '2026-03-03T12:00:00Z' }));
+    conviteService.aceitarPorId.and.returnValue(of({ marcaId: 'm4', marcaNome: 'Delta', gestorNome: 'Gestor', marcaAtiva: true, entrouEm: '2026-03-03T12:00:00Z' }));
     conviteService.recusarPorId.and.returnValue(of(undefined));
     iniciar([alfa]);
     expect(promotorService.meusVinculos).toHaveBeenCalledTimes(1);
@@ -90,7 +90,7 @@ describe('PromotorVinculosComponent', () => {
     expect(promotorService.meusVinculos).toHaveBeenCalledTimes(1);
 
     promotorService.meusVinculos.and.returnValue(
-      of({ vinculos: [alfa, { marcaId: 'm4', marcaNome: 'Delta', gestorNome: 'Gestor', entrouEm: '2026-03-03T12:00:00Z' }] }),
+      of({ vinculos: [alfa, { marcaId: 'm4', marcaNome: 'Delta', gestorNome: 'Gestor', marcaAtiva: true, entrouEm: '2026-03-03T12:00:00Z' }] }),
     );
     botao('Aceitar').click();
     fixture.detectChanges();

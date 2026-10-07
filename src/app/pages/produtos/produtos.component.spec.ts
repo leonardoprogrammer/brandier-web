@@ -10,7 +10,7 @@ import { ProdutoService } from '../../services/produto.service';
 import { ProdutosComponent } from './produtos.component';
 
 describe('ProdutosComponent', () => {
-  const marca: Marca = { id: 'm1', nome: 'Alfa', descricao: null, criadoEm: '2026-01-01T00:00:00Z' };
+  const marca: Marca = { id: 'm1', nome: 'Alfa', descricao: null, ativa: true, criadoEm: '2026-01-01T00:00:00Z' };
   const sabonete: Produto = { id: 'p1', nome: 'Sabonete', codigo: 'SKU-1', ativo: true, criadoEm: '2026-01-01T00:00:00Z' };
   const shampoo: Produto = { id: 'p2', nome: 'Shampoo', codigo: null, ativo: true, criadoEm: '2026-01-02T00:00:00Z' };
   let fixture: ComponentFixture<ProdutosComponent>;

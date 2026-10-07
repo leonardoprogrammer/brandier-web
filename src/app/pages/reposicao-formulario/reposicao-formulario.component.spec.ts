@@ -33,7 +33,7 @@ describe('ReposicaoFormularioComponent', () => {
     limite: 10,
   };
   const marcasGeridas: MinhasMarcas = {
-    marcas: [{ id: 'm1', nome: 'Alfa', descricao: null, criadoEm: '2026-01-01T00:00:00Z' }],
+    marcas: [{ id: 'm1', nome: 'Alfa', descricao: null, ativa: true, criadoEm: '2026-01-01T00:00:00Z' }],
     limite: 2,
   };
   const semVinculos: MeusVinculos = { vinculos: [] };
@@ -135,8 +135,8 @@ describe('ReposicaoFormularioComponent', () => {
         marcaService.listar.and.returnValue(
           of({
             marcas: [
-              { id: 'm2', nome: 'Zeta', descricao: null, criadoEm: '2026-01-01T00:00:00Z' },
-              { id: 'm1', nome: 'Alfa', descricao: null, criadoEm: '2026-01-01T00:00:00Z' },
+              { id: 'm2', nome: 'Zeta', descricao: null, ativa: true, criadoEm: '2026-01-01T00:00:00Z' },
+              { id: 'm1', nome: 'Alfa', descricao: null, ativa: true, criadoEm: '2026-01-01T00:00:00Z' },
             ],
             limite: 2,
           }),
@@ -144,8 +144,8 @@ describe('ReposicaoFormularioComponent', () => {
         promotorService.meusVinculos.and.returnValue(
           of({
             vinculos: [
-              { marcaId: 'm1', marcaNome: 'Alfa', gestorNome: 'G', entrouEm: '2026-01-01T00:00:00Z' },
-              { marcaId: 'm3', marcaNome: 'Beta', gestorNome: 'G', entrouEm: '2026-01-01T00:00:00Z' },
+              { marcaId: 'm1', marcaNome: 'Alfa', gestorNome: 'G', marcaAtiva: true, entrouEm: '2026-01-01T00:00:00Z' },
+              { marcaId: 'm3', marcaNome: 'Beta', gestorNome: 'G', marcaAtiva: true, entrouEm: '2026-01-01T00:00:00Z' },
             ],
           }),
         );
@@ -154,6 +154,23 @@ describe('ReposicaoFormularioComponent', () => {
         const nomes = Array.from(campo<HTMLSelectElement>('#marca').options).map((o) => o.textContent?.trim());
         expect(nomes).toEqual(['Selecione a marca', 'Alfa', 'Beta', 'Zeta']);
         expect(campo('#loja', )).toBeNull();
+      });
+
+      it('não lista marcas inativas em que o usuário é promotor', async () => {
+        await montar();
+        marcaService.listar.and.returnValue(of({ marcas: [], limite: 2 }));
+        promotorService.meusVinculos.and.returnValue(
+          of({
+            vinculos: [
+              { marcaId: 'm1', marcaNome: 'Alfa', gestorNome: 'G', marcaAtiva: true, entrouEm: '2026-01-01T00:00:00Z' },
+              { marcaId: 'm2', marcaNome: 'Beta', gestorNome: 'G', marcaAtiva: false, entrouEm: '2026-01-01T00:00:00Z' },
+            ],
+          }),
+        );
+        fixture.detectChanges();
+
+        const nomes = Array.from(campo<HTMLSelectElement>('#marca').options).map((o) => o.textContent?.trim());
+        expect(nomes).toEqual(['Selecione a marca', 'Alfa']);
       });
 
       it('seleciona a única marca disponível e carrega lojas e produtos', async () => {
@@ -171,8 +188,8 @@ describe('ReposicaoFormularioComponent', () => {
         marcaService.listar.and.returnValue(
           of({
             marcas: [
-              { id: 'm1', nome: 'Alfa', descricao: null, criadoEm: '2026-01-01T00:00:00Z' },
-              { id: 'm2', nome: 'Beta', descricao: null, criadoEm: '2026-01-01T00:00:00Z' },
+              { id: 'm1', nome: 'Alfa', descricao: null, ativa: true, criadoEm: '2026-01-01T00:00:00Z' },
+              { id: 'm2', nome: 'Beta', descricao: null, ativa: true, criadoEm: '2026-01-01T00:00:00Z' },
             ],
             limite: 2,
           }),
@@ -188,8 +205,8 @@ describe('ReposicaoFormularioComponent', () => {
         marcaService.listar.and.returnValue(
           of({
             marcas: [
-              { id: 'm1', nome: 'Alfa', descricao: null, criadoEm: '2026-01-01T00:00:00Z' },
-              { id: 'm2', nome: 'Beta', descricao: null, criadoEm: '2026-01-01T00:00:00Z' },
+              { id: 'm1', nome: 'Alfa', descricao: null, ativa: true, criadoEm: '2026-01-01T00:00:00Z' },
+              { id: 'm2', nome: 'Beta', descricao: null, ativa: true, criadoEm: '2026-01-01T00:00:00Z' },
             ],
             limite: 2,
           }),
@@ -209,8 +226,8 @@ describe('ReposicaoFormularioComponent', () => {
         marcaService.listar.and.returnValue(
           of({
             marcas: [
-              { id: 'm1', nome: 'Alfa', descricao: null, criadoEm: '2026-01-01T00:00:00Z' },
-              { id: 'm2', nome: 'Beta', descricao: null, criadoEm: '2026-01-01T00:00:00Z' },
+              { id: 'm1', nome: 'Alfa', descricao: null, ativa: true, criadoEm: '2026-01-01T00:00:00Z' },
+              { id: 'm2', nome: 'Beta', descricao: null, ativa: true, criadoEm: '2026-01-01T00:00:00Z' },
             ],
             limite: 2,
           }),

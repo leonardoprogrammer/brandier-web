@@ -11,7 +11,7 @@ import { ConviteComponent } from './convite.component';
 
 describe('ConviteComponent', () => {
   const recebido: ConviteRecebido = { marcaNome: 'Alfa', gestorNome: 'Gestor Silva', email: 'eu@exemplo.com', expiraEm: '2026-03-08T12:00:00Z' };
-  const vinculo: VinculoPromotor = { marcaId: 'm1', marcaNome: 'Alfa', gestorNome: 'Gestor Silva', entrouEm: '2026-03-01T12:00:00Z' };
+  const vinculo: VinculoPromotor = { marcaId: 'm1', marcaNome: 'Alfa', gestorNome: 'Gestor Silva', marcaAtiva: true, entrouEm: '2026-03-01T12:00:00Z' };
   let fixture: ComponentFixture<ConviteComponent>;
   let conviteService: jasmine.SpyObj<ConviteService>;
   let router: Router;

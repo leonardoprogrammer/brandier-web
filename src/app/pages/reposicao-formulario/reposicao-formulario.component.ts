@@ -289,7 +289,9 @@ export class ReposicaoFormularioComponent implements OnInit {
         next: ({ geridas, vinculos }) => {
           const porId = new Map<string, OpcaoMarca>();
           geridas.marcas.forEach((marca) => porId.set(marca.id, { id: marca.id, nome: marca.nome }));
-          vinculos.vinculos.forEach((vinculo) => porId.set(vinculo.marcaId, { id: vinculo.marcaId, nome: vinculo.marcaNome }));
+          vinculos.vinculos
+            .filter((vinculo) => vinculo.marcaAtiva)
+            .forEach((vinculo) => porId.set(vinculo.marcaId, { id: vinculo.marcaId, nome: vinculo.marcaNome }));
           const opcoes = [...porId.values()].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
           this.marcas.set(opcoes);
 

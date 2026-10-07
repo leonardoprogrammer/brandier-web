@@ -9,7 +9,7 @@ import { ConvitesRecebidosComponent, RespostaAoConvite } from './convites-recebi
 describe('ConvitesRecebidosComponent', () => {
   const alfa: ConvitePendente = { id: 'c1', marcaNome: 'Alfa', gestorNome: 'Gestor Silva', expiraEm: '2026-03-08T12:00:00Z', criadoEm: '2026-03-01T12:00:00Z' };
   const beta: ConvitePendente = { id: 'c2', marcaNome: 'Beta', gestorNome: 'Outra Gestora', expiraEm: '2026-03-09T12:00:00Z', criadoEm: '2026-03-02T12:00:00Z' };
-  const vinculo: VinculoPromotor = { marcaId: 'm1', marcaNome: 'Alfa', gestorNome: 'Gestor Silva', entrouEm: '2026-03-03T12:00:00Z' };
+  const vinculo: VinculoPromotor = { marcaId: 'm1', marcaNome: 'Alfa', gestorNome: 'Gestor Silva', marcaAtiva: true, entrouEm: '2026-03-03T12:00:00Z' };
   let fixture: ComponentFixture<ConvitesRecebidosComponent>;
   let conviteService: jasmine.SpyObj<ConviteService>;
   let respostas: RespostaAoConvite[];

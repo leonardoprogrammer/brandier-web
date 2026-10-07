@@ -35,7 +35,7 @@ describe('RelatoriosComponent', () => {
     usadas: 1,
     limite: 5,
   };
-  const marcasGeridas: MinhasMarcas = { marcas: [{ id: 'm1', nome: 'Alfa', descricao: null, criadoEm: '2026-01-01T00:00:00Z' }], limite: 2 };
+  const marcasGeridas: MinhasMarcas = { marcas: [{ id: 'm1', nome: 'Alfa', descricao: null, ativa: true, criadoEm: '2026-01-01T00:00:00Z' }], limite: 2 };
   const semVinculos: MeusVinculos = { vinculos: [] };
   const reposicao: Reposicao = {
     id: 'r1',
@@ -132,12 +132,12 @@ describe('RelatoriosComponent', () => {
 
     it('junta marcas geridas e de promotor, e o gestor prevalece quando a marca está nas duas', async () => {
       await montar();
-      marcaService.listar.and.returnValue(of({ marcas: [{ id: 'm1', nome: 'Alfa', descricao: null, criadoEm: '2026-01-01T00:00:00Z' }], limite: 2 }));
+      marcaService.listar.and.returnValue(of({ marcas: [{ id: 'm1', nome: 'Alfa', descricao: null, ativa: true, criadoEm: '2026-01-01T00:00:00Z' }], limite: 2 }));
       promotorService.meusVinculos.and.returnValue(
         of({
           vinculos: [
-            { marcaId: 'm1', marcaNome: 'Alfa', gestorNome: 'G', entrouEm: '2026-01-01T00:00:00Z' },
-            { marcaId: 'm2', marcaNome: 'Beta', gestorNome: 'G', entrouEm: '2026-01-01T00:00:00Z' },
+            { marcaId: 'm1', marcaNome: 'Alfa', gestorNome: 'G', marcaAtiva: true, entrouEm: '2026-01-01T00:00:00Z' },
+            { marcaId: 'm2', marcaNome: 'Beta', gestorNome: 'G', marcaAtiva: true, entrouEm: '2026-01-01T00:00:00Z' },
           ],
         } as MeusVinculos),
       );
@@ -151,9 +151,9 @@ describe('RelatoriosComponent', () => {
 
     it('pré-seleciona a marca da URL', async () => {
       await montar({ marca: 'm2' });
-      marcaService.listar.and.returnValue(of({ marcas: [{ id: 'm1', nome: 'Alfa', descricao: null, criadoEm: '2026-01-01T00:00:00Z' }], limite: 2 }));
+      marcaService.listar.and.returnValue(of({ marcas: [{ id: 'm1', nome: 'Alfa', descricao: null, ativa: true, criadoEm: '2026-01-01T00:00:00Z' }], limite: 2 }));
       promotorService.meusVinculos.and.returnValue(
-        of({ vinculos: [{ marcaId: 'm2', marcaNome: 'Beta', gestorNome: 'G', entrouEm: '2026-01-01T00:00:00Z' }] }),
+        of({ vinculos: [{ marcaId: 'm2', marcaNome: 'Beta', gestorNome: 'G', marcaAtiva: true, entrouEm: '2026-01-01T00:00:00Z' }] }),
       );
       fixture.detectChanges();
 
@@ -187,7 +187,7 @@ describe('RelatoriosComponent', () => {
 
     it('trocar de marca limpa filtros e resultados e recarrega o contexto', async () => {
       await montar();
-      marcaService.listar.and.returnValue(of({ marcas: [{ id: 'm1', nome: 'Alfa', descricao: null, criadoEm: '2026-01-01T00:00:00Z' }, { id: 'm3', nome: 'Gama', descricao: null, criadoEm: '2026-01-01T00:00:00Z' }], limite: 2 }));
+      marcaService.listar.and.returnValue(of({ marcas: [{ id: 'm1', nome: 'Alfa', descricao: null, ativa: true, criadoEm: '2026-01-01T00:00:00Z' }, { id: 'm3', nome: 'Gama', descricao: null, ativa: true, criadoEm: '2026-01-01T00:00:00Z' }], limite: 2 }));
       fixture.detectChanges();
       selecionar('#filtro-marca', 'm1');
       selecionar('#filtro-loja', 'l1');
@@ -273,7 +273,7 @@ describe('RelatoriosComponent', () => {
       await montar();
       marcaService.listar.and.returnValue(of({ marcas: [], limite: 2 }));
       promotorService.meusVinculos.and.returnValue(
-        of({ vinculos: [{ marcaId: 'm2', marcaNome: 'Beta', gestorNome: 'G', entrouEm: '2026-01-01T00:00:00Z' }] }),
+        of({ vinculos: [{ marcaId: 'm2', marcaNome: 'Beta', gestorNome: 'G', marcaAtiva: true, entrouEm: '2026-01-01T00:00:00Z' }] }),
       );
       fixture.detectChanges();
 
