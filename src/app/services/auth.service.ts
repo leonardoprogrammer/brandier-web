@@ -59,6 +59,16 @@ export class AuthService {
       .pipe(tap(() => this.usuarioAtual.set(null)));
   }
 
+  atualizarNome(nome: string): Observable<Usuario> {
+    return this.http.put<Usuario>(this.baseUrl, { nome }).pipe(tap((usuario) => this.usuarioAtual.set(usuario)));
+  }
+
+  alterarSenha(senhaAtual: string, novaSenha: string): Observable<void> {
+    return this.http
+      .post<void>(`${this.baseUrl}/alterar-senha`, { senhaAtual, novaSenha })
+      .pipe(tap(() => this.usuarioAtual.set(null)));
+  }
+
   sair(): Observable<MensagemResposta> {
     return this.http
       .post<MensagemResposta>(`${this.baseUrl}/logout`, null)

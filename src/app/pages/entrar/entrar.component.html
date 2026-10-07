@@ -7,6 +7,10 @@
     <p class="aviso aviso-sucesso mb-4" role="status" data-testid="conta-excluida">Sua conta foi excluída. Obrigado por testar o Brandier!</p>
   }
 
+  @if (senhaAlterada) {
+    <p class="aviso aviso-sucesso mb-4" role="status" data-testid="senha-alterada">Senha alterada com sucesso. Entre novamente.</p>
+  }
+
   <form [formGroup]="form" (ngSubmit)="entrar()" novalidate class="space-y-4">
     @if (erro(); as mensagem) {
       <p class="aviso aviso-erro" role="alert">{{ mensagem }}</p>

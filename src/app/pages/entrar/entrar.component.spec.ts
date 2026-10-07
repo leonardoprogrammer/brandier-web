@@ -186,10 +186,18 @@ describe('EntrarComponent com avisos pela URL', () => {
     expect(tela.querySelector('[data-testid="conta-excluida"]')).toBeNull();
   });
 
+  it('mostra a confirmação quando a senha acabou de ser alterada', async () => {
+    const tela = await montar({ senhaAlterada: 'true' });
+
+    expect(tela.querySelector('[data-testid="senha-alterada"]')?.textContent).toContain('Senha alterada com sucesso');
+    expect(tela.querySelector('[data-testid="conta-excluida"]')).toBeNull();
+  });
+
   it('sem parâmetros não mostra nenhum aviso', async () => {
     const tela = await montar({});
 
     expect(tela.querySelector('[data-testid="conta-excluida"]')).toBeNull();
+    expect(tela.querySelector('[data-testid="senha-alterada"]')).toBeNull();
     expect(tela.textContent).not.toContain('Sua sessão expirou');
   });
 });

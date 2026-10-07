@@ -141,6 +141,41 @@ describe('AuthService', () => {
     expect(service.autenticado()).toBeTrue();
   });
 
+  it('atualizarNome envia PUT com o nome e guarda o usuário devolvido', () => {
+    service.atualizarNome('Novo Nome').subscribe();
+
+    const requisicao = http.expectOne('/api/v1/usuario');
+    expect(requisicao.request.method).toBe('PUT');
+    expect(requisicao.request.body).toEqual({ nome: 'Novo Nome' });
+    requisicao.flush({ id: '1', nome: 'Novo Nome', email: 'pessoa@exemplo.com' });
+
+    expect(service.usuario()).toEqual({ id: '1', nome: 'Novo Nome', email: 'pessoa@exemplo.com' });
+  });
+
+  it('alterarSenha envia a senha atual e a nova e encerra a sessão local', () => {
+    service.entrar('pessoa@exemplo.com', 'Senha1234').subscribe();
+    http.expectOne('/api/v1/usuario/login').flush(usuario);
+    expect(service.autenticado()).toBeTrue();
+
+    service.alterarSenha('Senha1234', 'SenhaNova12').subscribe();
+
+    const requisicao = http.expectOne('/api/v1/usuario/alterar-senha');
+    expect(requisicao.request.method).toBe('POST');
+    expect(requisicao.request.body).toEqual({ senhaAtual: 'Senha1234', novaSenha: 'SenhaNova12' });
+    requisicao.flush(null, { status: 204, statusText: 'No Content' });
+    expect(service.autenticado()).toBeFalse();
+  });
+
+  it('alterarSenha mantém a sessão local quando a senha atual está incorreta', () => {
+    service.entrar('pessoa@exemplo.com', 'Senha1234').subscribe();
+    http.expectOne('/api/v1/usuario/login').flush(usuario);
+
+    service.alterarSenha('errada', 'SenhaNova12').subscribe({ error: () => undefined });
+    http.expectOne('/api/v1/usuario/alterar-senha').flush({ codigo: 'SENHA_INCORRETA' }, { status: 403, statusText: 'Forbidden' });
+
+    expect(service.autenticado()).toBeTrue();
+  });
+
   it('sair limpa o usuário mesmo quando a API falha', () => {
     service.entrar('pessoa@exemplo.com', 'Senha1234').subscribe();
     http.expectOne('/api/v1/usuario/login').flush(usuario);

@@ -21,6 +21,7 @@ export class EntrarComponent {
 
   protected readonly sessaoExpirada = this.parametros.has('sessaoExpirada');
   protected readonly contaExcluida = this.parametros.has('contaExcluida');
+  protected readonly senhaAlterada = this.parametros.has('senhaAlterada');
 
   protected readonly form = this.formBuilder.group({
     email: ['', [Validators.required, Validators.email, Validators.maxLength(254)]],

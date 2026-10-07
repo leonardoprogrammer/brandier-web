@@ -14,7 +14,7 @@ describe('ContaComponent', () => {
   let router: Router;
 
   beforeEach(async () => {
-    auth = jasmine.createSpyObj<AuthService>('AuthService', ['excluirConta']);
+    auth = jasmine.createSpyObj<AuthService>('AuthService', ['excluirConta', 'atualizarNome', 'alterarSenha']);
     Object.defineProperty(auth, 'usuario', {
       value: signal<Usuario | null>({ id: '1', nome: 'Pessoa Teste', email: 'pessoa@exemplo.com' }).asReadonly(),
     });
@@ -54,6 +54,13 @@ describe('ContaComponent', () => {
 
   function enviar(): void {
     elemento().querySelector('form')!.dispatchEvent(new Event('submit'));
+    fixture.detectChanges();
+  }
+
+  function digitar(seletor: string, valor: string): void {
+    const campo = elemento().querySelector<HTMLInputElement>(seletor)!;
+    campo.value = valor;
+    campo.dispatchEvent(new Event('input'));
     fixture.detectChanges();
   }
 
@@ -178,5 +185,194 @@ describe('ContaComponent', () => {
 
     expect(elemento().textContent).toContain('Não foi possível conectar ao servidor');
     expect(router.navigate).not.toHaveBeenCalled();
+  });
+
+  describe('editar nome', () => {
+    function abrirEdicao(): void {
+      botao('Editar').click();
+      fixture.detectChanges();
+    }
+
+    it('mostra um botão para editar o nome', () => {
+      expect(botao('Editar')).toBeDefined();
+    });
+
+    it('abre um formulário com o nome atual preenchido', () => {
+      abrirEdicao();
+
+      expect(elemento().querySelector<HTMLInputElement>('#nome')!.value).toBe('Pessoa Teste');
+    });
+
+    it('cancelar fecha o formulário sem chamar o serviço', () => {
+      abrirEdicao();
+      digitar('#nome', 'Outro Nome');
+
+      botao('Cancelar').click();
+      fixture.detectChanges();
+
+      expect(elemento().querySelector('#nome')).toBeNull();
+      expect(auth.atualizarNome).not.toHaveBeenCalled();
+    });
+
+    it('nome vazio mostra erro de validação e não chama o serviço', () => {
+      abrirEdicao();
+      digitar('#nome', '   ');
+
+      enviar();
+
+      expect(auth.atualizarNome).not.toHaveBeenCalled();
+      expect(elemento().textContent).toContain('Informe seu nome.');
+    });
+
+    it('salva o nome sem espaços nas pontas e fecha o formulário', () => {
+      auth.atualizarNome.and.returnValue(of({ id: '1', nome: 'Novo Nome', email: 'pessoa@exemplo.com' }));
+      abrirEdicao();
+      digitar('#nome', '  Novo Nome  ');
+
+      enviar();
+
+      expect(auth.atualizarNome).toHaveBeenCalledOnceWith('Novo Nome');
+      expect(elemento().querySelector('#nome')).toBeNull();
+      expect(botao('Editar')).toBeDefined();
+    });
+
+    it('mostra erro e mantém o formulário aberto quando o servidor recusa', () => {
+      auth.atualizarNome.and.returnValue(throwError(() => new HttpErrorResponse({ status: 0 })));
+      abrirEdicao();
+      digitar('#nome', 'Novo Nome');
+
+      enviar();
+
+      expect(elemento().textContent).toContain('Não foi possível conectar ao servidor');
+      expect(elemento().querySelector('#nome')).not.toBeNull();
+    });
+  });
+
+  describe('alterar senha', () => {
+    function abrirFormulario(): void {
+      botao('Alterar senha').click();
+      fixture.detectChanges();
+    }
+
+    function preencherValido(): void {
+      digitar('#senha-atual', 'SenhaAtual1');
+      digitar('#nova-senha', 'SenhaNova12');
+      digitar('#confirmar-nova-senha', 'SenhaNova12');
+    }
+
+    it('mostra o botão e o formulário aparece ao clicar', () => {
+      abrirFormulario();
+
+      expect(elemento().querySelector('#senha-atual')).not.toBeNull();
+      expect(elemento().querySelector('#nova-senha')).not.toBeNull();
+      expect(elemento().querySelector('#confirmar-nova-senha')).not.toBeNull();
+    });
+
+    it('cancelar fecha o formulário e limpa os campos', () => {
+      abrirFormulario();
+      preencherValido();
+
+      botao('Cancelar').click();
+      fixture.detectChanges();
+      abrirFormulario();
+
+      expect(elemento().querySelector<HTMLInputElement>('#senha-atual')!.value).toBe('');
+      expect(auth.alterarSenha).not.toHaveBeenCalled();
+    });
+
+    it('não envia com campos vazios e mostra os avisos', () => {
+      abrirFormulario();
+
+      enviar();
+
+      expect(auth.alterarSenha).not.toHaveBeenCalled();
+      expect(elemento().textContent).toContain('Informe sua senha atual.');
+      expect(elemento().textContent).toContain('Informe a nova senha.');
+      expect(elemento().textContent).toContain('Confirme a nova senha.');
+    });
+
+    it('nova senha sem número mostra o erro de requisitos', () => {
+      abrirFormulario();
+      digitar('#senha-atual', 'SenhaAtual1');
+      digitar('#nova-senha', 'somenteletras');
+      digitar('#confirmar-nova-senha', 'somenteletras');
+
+      enviar();
+
+      expect(auth.alterarSenha).not.toHaveBeenCalled();
+      expect(elemento().textContent).toContain('A senha deve conter letras e números.');
+    });
+
+    it('senhas diferentes mostram o erro de confirmação', () => {
+      abrirFormulario();
+      digitar('#senha-atual', 'SenhaAtual1');
+      digitar('#nova-senha', 'SenhaNova12');
+      digitar('#confirmar-nova-senha', 'Diferente12');
+
+      enviar();
+
+      expect(auth.alterarSenha).not.toHaveBeenCalled();
+      expect(elemento().textContent).toContain('As senhas não conferem.');
+    });
+
+    it('altera a senha, encerra a sessão e vai para o login avisando a troca', () => {
+      auth.alterarSenha.and.returnValue(of(undefined));
+      abrirFormulario();
+      preencherValido();
+
+      enviar();
+
+      expect(auth.alterarSenha).toHaveBeenCalledOnceWith('SenhaAtual1', 'SenhaNova12');
+      expect(router.navigate).toHaveBeenCalledWith(['/entrar'], { queryParams: { senhaAlterada: true } });
+    });
+
+    it('desabilita os botões enquanto altera', () => {
+      auth.alterarSenha.and.returnValue(new Subject<void>());
+      abrirFormulario();
+      preencherValido();
+
+      enviar();
+
+      expect(botao('Alterando...').disabled).toBeTrue();
+      expect(botao('Cancelar').disabled).toBeTrue();
+    });
+
+    it('mostra erro no campo da senha atual quando ela está incorreta', () => {
+      auth.alterarSenha.and.returnValue(
+        throwError(() => new HttpErrorResponse({ status: 403, error: { codigo: 'SENHA_INCORRETA', detail: 'A senha informada está incorreta.' } })),
+      );
+      abrirFormulario();
+      preencherValido();
+
+      enviar();
+
+      expect(elemento().querySelector('#senha-atual-erro')?.textContent).toContain('A senha atual informada está incorreta.');
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+
+    it('mostra erro genérico quando o servidor falha', () => {
+      auth.alterarSenha.and.returnValue(throwError(() => new HttpErrorResponse({ status: 0 })));
+      abrirFormulario();
+      preencherValido();
+
+      enviar();
+
+      expect(elemento().textContent).toContain('Não foi possível conectar ao servidor');
+    });
+
+    it('alterna a visibilidade das três senhas', () => {
+      abrirFormulario();
+      const senhaAtual = elemento().querySelector<HTMLInputElement>('#senha-atual')!;
+      const novaSenha = elemento().querySelector<HTMLInputElement>('#nova-senha')!;
+      const confirmar = elemento().querySelector<HTMLInputElement>('#confirmar-nova-senha')!;
+      expect(senhaAtual.type).toBe('password');
+
+      elemento().querySelector<HTMLInputElement>('input[type="checkbox"]')!.click();
+      fixture.detectChanges();
+
+      expect(senhaAtual.type).toBe('text');
+      expect(novaSenha.type).toBe('text');
+      expect(confirmar.type).toBe('text');
+    });
   });
 });
