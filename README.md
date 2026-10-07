@@ -26,6 +26,7 @@ A API fica no repositório `brandier-api`.
 | `/esqueci-senha` | Pede o link de redefinição de senha | Visitante |
 | `/redefinir-senha` | Define a nova senha pelo link recebido | Qualquer |
 | `/sobre` | Sobre o projeto, privacidade e contato | Público |
+| `/como-funciona` | Passo a passo, papéis, limites e perguntas frequentes | Público |
 | `/convite` | Abre o convite recebido por e-mail (token na URL, removido ao abrir) | Qualquer |
 | `/painel` | Início do painel: minhas reposições e minhas marcas, com seletor de período | Autenticado |
 | `/painel/marcas` | Lista de marcas, uso do limite e exclusão | Autenticado |
@@ -45,6 +46,8 @@ A API fica no repositório `brandier-api`.
 | `/painel/reposicoes/nova` | Registra uma reposição | Autenticado |
 | `/painel/reposicoes/:marcaId/:id` | Edita uma reposição (dentro do prazo, para promotores) | Autenticado |
 | `/painel/promotor` | Convites recebidos, marcas em que sou promotor e sair delas | Autenticado |
+| `/painel/como-funciona` | Mesma página Como funciona, dentro do painel | Autenticado |
+| `/painel/conta` | Minha conta: editar nome, alterar senha e exclusão da conta (com senha) | Autenticado |
 | `/painel/sobre` | Mesma página Sobre, dentro do painel | Autenticado |
 
 ## Estrutura do código
@@ -82,11 +85,15 @@ Em `src/app`:
 - Os *guards* só consultam a sessão no navegador (no servidor, deixam passar), porque os cookies `HttpOnly` não são legíveis pelo JavaScript.
 - O token dos links de e-mail é **removido da barra de endereço** assim que a tela carrega, e o `index.html` define a política de *referrer* como `same-origin`.
 
+### Tema
+
+- Três opções — **Claro**, **Escuro** e **Sistema** (padrão) — no seletor `app-tema-toggle`, presente nos três layouts (painel, público e de autenticação). `TemaService` guarda a escolha em `localStorage` (`brandier-tema`) e aplica a classe `dark` em `<html>`; com "Sistema", acompanha `prefers-color-scheme` e reage a mudanças em tempo real. Tailwind usa `darkMode: 'class'`; as classes de componente (`campo-entrada`, `botao-primario`, `aviso-*`…) em `styles.scss` já têm as variantes `dark:`. Um script inline no `index.html` lê o `localStorage` antes do Angular iniciar, para não piscar o tema errado.
+
 ### Formulários e acessibilidade
 
 - As validações do front **espelham as da API** (por exemplo, limite de 72 bytes na senha), mas a API continua sendo a fonte da verdade; erros por campo vindos dela aparecem junto ao campo.
 - Rótulos associados, `aria-invalid`, mensagens com `role="alert"` e estados de carregamento e erro em todas as telas.
-- Layout responsivo e sem dependência de biblioteca de componentes.
+- Layout responsivo (mobile, tablet e desktop) e sem dependência de biblioteca de componentes; cabeçalhos e grades quebram a linha (`flex-wrap`/`grid-cols-1` com breakpoints) em vez de espremer o conteúdo em telas estreitas.
 
 ## Como executar
 
@@ -109,6 +116,7 @@ A aplicação sobe em `http://localhost:4200`. O arquivo `proxy.conf.json` encam
 ### Configuração
 
 - `src/environments/environment*.ts`: contém só valores **públicos** (`apiUrl: '/api/v1'`). Tudo que vai nesses arquivos é entregue ao navegador, então **nenhum segredo** deve ficar ali.
+- `turnstileSiteKey` (nos mesmos arquivos): a **chave pública** do Cloudflare Turnstile. Vazia, o widget não aparece no cadastro; preenchida, o cadastro passa a exigir a verificação (e a API precisa ter `brandier.turnstile.enabled=true` com a chave secreta correspondente, que nunca vai para o front).
 - `.env.example`: variáveis do processo Node do SSR (`PORT`). O `.env` real não é versionado.
 
 ## Testes
@@ -118,3 +126,7 @@ npm test -- --watch=false --browsers=ChromeHeadless
 ```
 
 Cobrem validadores, leitura de erros da API, serviço de autenticação, interceptor, guards, as telas de autenticação, a página Sobre, o layout do painel e as telas de marcas, lojas, produtos, promotores, convites e reposições. O build de produção (`npm run build`) também compila os templates em modo estrito.
+
+## Licença
+
+Código sob a [licença MIT](LICENSE): você pode usar, copiar, modificar e distribuir. A instância online da demonstração continua sem fins comerciais.
