@@ -2,11 +2,12 @@
   @for (dias of opcoes; track dias) {
     <button
       type="button"
-      class="rounded-full px-3 py-1 text-sm font-medium ring-1 ring-slate-300 hover:bg-slate-50"
+      class="rounded-full px-3 py-1 text-sm font-medium ring-1 ring-slate-300 dark:ring-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800"
       [class.bg-indigo-600]="selecionada() === dias"
       [class.text-white]="selecionada() === dias"
       [class.ring-indigo-600]="selecionada() === dias"
       [class.text-slate-700]="selecionada() !== dias"
+      [class.dark:text-slate-300]="selecionada() !== dias"
       [attr.aria-pressed]="selecionada() === dias"
       (click)="escolher(dias)"
     >
@@ -16,11 +17,12 @@
   @if (permitirTodo()) {
     <button
       type="button"
-      class="rounded-full px-3 py-1 text-sm font-medium ring-1 ring-slate-300 hover:bg-slate-50"
+      class="rounded-full px-3 py-1 text-sm font-medium ring-1 ring-slate-300 dark:ring-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800"
       [class.bg-indigo-600]="selecionada() === 'todo'"
       [class.text-white]="selecionada() === 'todo'"
       [class.ring-indigo-600]="selecionada() === 'todo'"
       [class.text-slate-700]="selecionada() !== 'todo'"
+      [class.dark:text-slate-300]="selecionada() !== 'todo'"
       [attr.aria-pressed]="selecionada() === 'todo'"
       (click)="escolherTodo()"
     >
@@ -29,11 +31,12 @@
   }
   <button
     type="button"
-    class="rounded-full px-3 py-1 text-sm font-medium ring-1 ring-slate-300 hover:bg-slate-50"
+    class="rounded-full px-3 py-1 text-sm font-medium ring-1 ring-slate-300 dark:ring-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800"
     [class.bg-indigo-600]="selecionada() === 'personalizado'"
     [class.text-white]="selecionada() === 'personalizado'"
     [class.ring-indigo-600]="selecionada() === 'personalizado'"
     [class.text-slate-700]="selecionada() !== 'personalizado'"
+    [class.dark:text-slate-300]="selecionada() !== 'personalizado'"
     [attr.aria-pressed]="selecionada() === 'personalizado'"
     (click)="abrirPersonalizado()"
   >

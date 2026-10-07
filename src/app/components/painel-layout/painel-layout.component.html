@@ -1,13 +1,14 @@
 <div class="flex min-h-screen flex-col">
-  <header class="border-b border-slate-200 bg-white">
-    <div class="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3">
+  <header class="border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+    <div class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3">
       <a routerLink="/painel" class="flex items-center gap-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600/40" aria-label="Brandier, início do painel">
         <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-lg font-bold text-white" aria-hidden="true">B</span>
-        <span class="text-xl font-bold tracking-tight text-slate-900">Brandier</span>
+        <span class="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Brandier</span>
       </a>
 
-      <div class="flex items-center gap-3">
-        <span class="hidden max-w-[16rem] truncate text-sm text-slate-600 sm:inline" data-testid="nome-usuario">{{ usuario()?.nome }}</span>
+      <div class="flex flex-wrap items-center justify-end gap-x-3 gap-y-2">
+        <span class="hidden max-w-[16rem] truncate text-sm text-slate-600 dark:text-slate-400 sm:inline" data-testid="nome-usuario">{{ usuario()?.nome }}</span>
+        <app-tema-toggle />
         <a routerLink="/painel/conta" class="link-discreto text-sm" data-testid="link-conta">Minha conta</a>
         <button type="button" class="botao-secundario" [disabled]="saindo()" (click)="sair()">
           {{ saindo() ? 'Saindo...' : 'Sair' }}
@@ -15,7 +16,7 @@
       </div>
     </div>
 
-    <nav class="border-t border-slate-100" aria-label="Menu do painel">
+    <nav class="border-t border-slate-100 dark:border-slate-800" aria-label="Menu do painel">
       <ul class="mx-auto flex max-w-5xl gap-1 overflow-x-auto px-4 text-sm font-medium">
         <li>
           <a
@@ -87,8 +88,8 @@
     <router-outlet />
   </main>
 
-  <footer class="border-t border-slate-200 bg-white">
-    <div class="mx-auto max-w-5xl px-4 py-4 text-center text-xs text-slate-500">
+  <footer class="border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+    <div class="mx-auto max-w-5xl px-4 py-4 text-center text-xs text-slate-500 dark:text-slate-400">
       Projeto de portfólio, não é para uso comercial.
       <a routerLink="/painel/sobre" class="link-discreto">Sobre o projeto</a>
     </div>

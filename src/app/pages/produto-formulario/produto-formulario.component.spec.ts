@@ -8,7 +8,7 @@ import { ProdutoService } from '../../services/produto.service';
 import { ProdutoFormularioComponent } from './produto-formulario.component';
 
 describe('ProdutoFormularioComponent', () => {
-  const produto: Produto = { id: 'p1', nome: 'Sabonete', codigo: 'SKU-1', ativo: true, criadoEm: '2026-01-01T00:00:00Z' };
+  const produto: Produto = { id: 'p1', nome: 'Sabonete', codigo: 'SKU-1', cor: null, ativo: true, criadoEm: '2026-01-01T00:00:00Z' };
   let fixture: ComponentFixture<ProdutoFormularioComponent>;
   let produtoService: jasmine.SpyObj<ProdutoService>;
   let router: Router;
@@ -99,7 +99,7 @@ describe('ProdutoFormularioComponent', () => {
 
       enviar();
 
-      expect(produtoService.criar).toHaveBeenCalledWith('m1', { nome: 'Sabonete', codigo: 'SKU-1' });
+      expect(produtoService.criar).toHaveBeenCalledWith('m1', { nome: 'Sabonete', codigo: 'SKU-1', cor: null });
       expect(router.navigate).toHaveBeenCalledWith(['/painel/marcas', 'm1', 'produtos']);
     });
 
@@ -109,7 +109,35 @@ describe('ProdutoFormularioComponent', () => {
 
       enviar();
 
-      expect(produtoService.criar).toHaveBeenCalledWith('m1', { nome: 'Sabonete', codigo: '' });
+      expect(produtoService.criar).toHaveBeenCalledWith('m1', { nome: 'Sabonete', codigo: '', cor: null });
+    });
+
+    it('não mostra o seletor de cor até marcar a caixa', () => {
+      expect(elemento().querySelector('#cor')).toBeNull();
+
+      const caixa = elemento().querySelector<HTMLInputElement>('input[type="checkbox"]')!;
+      caixa.checked = true;
+      caixa.dispatchEvent(new Event('change'));
+      fixture.detectChanges();
+
+      expect(elemento().querySelector('#cor')).not.toBeNull();
+    });
+
+    it('envia a cor escolhida quando a caixa está marcada', () => {
+      produtoService.criar.and.returnValue(of(produto));
+      digitar(campoNome(), 'Sabonete');
+      const caixa = elemento().querySelector<HTMLInputElement>('input[type="checkbox"]')!;
+      caixa.checked = true;
+      caixa.dispatchEvent(new Event('change'));
+      fixture.detectChanges();
+      const campoCor = elemento().querySelector<HTMLInputElement>('#cor')!;
+      campoCor.value = '#4f46e5';
+      campoCor.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+
+      enviar();
+
+      expect(produtoService.criar).toHaveBeenCalledWith('m1', { nome: 'Sabonete', codigo: '', cor: '#4f46e5' });
     });
 
     it('desabilita o botão enquanto salva', () => {
@@ -188,6 +216,15 @@ describe('ProdutoFormularioComponent', () => {
       expect(botaoEnviar().textContent).toContain('Salvar alterações');
     });
 
+    it('marca a caixa de cor e mostra o seletor quando o produto já tem uma cor', async () => {
+      await iniciarEdicao();
+      produtoService.buscar.and.returnValue(of({ ...produto, cor: '#4f46e5' }));
+      fixture.detectChanges();
+
+      expect(elemento().querySelector<HTMLInputElement>('input[type="checkbox"]')!.checked).toBeTrue();
+      expect(elemento().querySelector<HTMLInputElement>('#cor')!.value).toBe('#4f46e5');
+    });
+
     it('preenche código vazio quando o produto não tem código', async () => {
       await iniciarEdicao();
       produtoService.buscar.and.returnValue(of({ ...produto, codigo: null }));
@@ -231,7 +268,7 @@ describe('ProdutoFormularioComponent', () => {
 
       enviar();
 
-      expect(produtoService.atualizar).toHaveBeenCalledWith('m1', 'p1', { nome: 'Sabonete Novo', codigo: 'SKU-1' });
+      expect(produtoService.atualizar).toHaveBeenCalledWith('m1', 'p1', { nome: 'Sabonete Novo', codigo: 'SKU-1', cor: null });
       expect(produtoService.criar).not.toHaveBeenCalled();
       expect(router.navigate).toHaveBeenCalledWith(['/painel/marcas', 'm1', 'produtos']);
     });

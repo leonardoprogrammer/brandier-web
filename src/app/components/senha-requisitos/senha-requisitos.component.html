@@ -1,6 +1,6 @@
 <ul id="senha-requisitos" class="mt-2 space-y-0.5 text-xs">
   @for (requisito of requisitos(); track requisito.descricao) {
-    <li [class]="requisito.atendido ? 'text-emerald-700' : 'text-slate-500'">
+    <li [class]="requisito.atendido ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'">
       <span aria-hidden="true">{{ requisito.atendido ? '✓' : '•' }}</span>
       {{ requisito.descricao }}
       <span class="sr-only">{{ requisito.atendido ? '(atendido)' : '(pendente)' }}</span>

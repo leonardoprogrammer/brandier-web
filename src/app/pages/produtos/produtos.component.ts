@@ -97,7 +97,7 @@ export class ProdutosComponent implements OnInit {
     this.erroExclusao.set(null);
     this.avisoInativacao.set(null);
     this.produtoService
-      .atualizar(this.marcaId, produto.id, { nome: produto.nome, codigo: produto.codigo ?? '', ativo: true })
+      .atualizar(this.marcaId, produto.id, { nome: produto.nome, codigo: produto.codigo ?? '', cor: produto.cor, ativo: true })
       .pipe(finalize(() => this.reativando.set(null)))
       .subscribe({
         next: (reativado) => this.substituir(reativado),

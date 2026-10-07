@@ -24,8 +24,8 @@ describe('RelatoriosComponent', () => {
   };
   const produtos: ProdutosDaMarca = {
     produtos: [
-      { id: 'p1', nome: 'Sabonete', codigo: null, ativo: true, criadoEm: '2026-01-01T00:00:00Z' },
-      { id: 'p2', nome: 'Antigo', codigo: null, ativo: false, criadoEm: '2026-01-01T00:00:00Z' },
+      { id: 'p1', nome: 'Sabonete', codigo: null, cor: null, ativo: true, criadoEm: '2026-01-01T00:00:00Z' },
+      { id: 'p2', nome: 'Antigo', codigo: null, cor: null, ativo: false, criadoEm: '2026-01-01T00:00:00Z' },
     ],
     limite: 10,
   };

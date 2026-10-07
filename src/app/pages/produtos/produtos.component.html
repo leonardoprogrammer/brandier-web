@@ -8,8 +8,8 @@
 } @else {
   <header class="mt-3 flex flex-wrap items-start justify-between gap-4">
     <div>
-      <h1 class="text-2xl font-bold tracking-tight text-slate-900">Produtos</h1>
-      <p class="mt-1 text-slate-600">
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Produtos</h1>
+      <p class="mt-1 text-slate-600 dark:text-slate-400">
         @if (marcaNome()) {
           Catálogo da marca <strong>{{ marcaNome() }}</strong>.
         } @else {
@@ -20,7 +20,7 @@
 
     @if (!carregando() && !falhou()) {
       <div class="flex items-center gap-3">
-        <span class="rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700" data-testid="uso-produtos">
+        <span class="rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1 text-sm font-medium text-slate-700 dark:text-slate-300" data-testid="uso-produtos">
           {{ ativos() }}/{{ limite() }} produtos ativos
         </span>
         @if (atingiuLimite()) {
@@ -47,29 +47,38 @@
 
   <div class="mt-6">
     @if (carregando()) {
-      <p class="text-slate-500" role="status">Carregando produtos...</p>
+      <p class="text-slate-500 dark:text-slate-400" role="status">Carregando produtos...</p>
     } @else if (falhou()) {
       <div class="aviso aviso-erro space-y-3" role="alert">
         <p>Não foi possível carregar os produtos.</p>
         <button type="button" class="botao-secundario" (click)="carregar()">Tentar de novo</button>
       </div>
     } @else if (produtos().length === 0) {
-      <div class="rounded-2xl border-2 border-dashed border-slate-300 bg-white p-10 text-center">
-        <h2 class="text-lg font-semibold text-slate-900">Esta marca ainda não tem produtos</h2>
-        <p class="mt-2 text-slate-600">Monte o catálogo que os promotores vão usar ao registrar reposições.</p>
+      <div class="rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 p-10 text-center">
+        <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Esta marca ainda não tem produtos</h2>
+        <p class="mt-2 text-slate-600 dark:text-slate-400">Monte o catálogo que os promotores vão usar ao registrar reposições.</p>
         <a [routerLink]="['/painel/marcas', marcaId, 'produtos', 'novo']" class="botao-primario mx-auto mt-5 w-auto">Cadastrar primeiro produto</a>
       </div>
     } @else {
       <ul class="grid gap-4 sm:grid-cols-2">
         @for (produto of produtos(); track produto.id) {
-          <li class="flex flex-col rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+          <li class="flex flex-col rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700">
             <div class="flex items-start justify-between gap-2">
-              <h2 class="text-lg font-semibold text-slate-900" [class.text-slate-500]="!produto.ativo">{{ produto.nome }}</h2>
+              <h2
+                class="flex items-center gap-2 text-lg font-semibold text-slate-900 dark:text-slate-100"
+                [class.text-slate-500]="!produto.ativo"
+                [class.dark:text-slate-400]="!produto.ativo"
+              >
+                @if (produto.cor) {
+                  <span class="inline-block h-3 w-3 shrink-0 rounded-full ring-1 ring-black/10 dark:ring-white/20" [style.background-color]="produto.cor" aria-hidden="true"></span>
+                }
+                {{ produto.nome }}
+              </h2>
               @if (!produto.ativo) {
-                <span class="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-medium text-slate-700" data-testid="selo-inativo">Inativo</span>
+                <span class="rounded-full bg-slate-200 dark:bg-slate-700 px-2 py-0.5 text-xs font-medium text-slate-700 dark:text-slate-300" data-testid="selo-inativo">Inativo</span>
               }
             </div>
-            <p class="mt-2 flex-1 text-sm text-slate-600">
+            <p class="mt-2 flex-1 text-sm text-slate-600 dark:text-slate-400">
               @if (produto.codigo) {
                 Código: {{ produto.codigo }}
               } @else {
@@ -78,8 +87,8 @@
             </p>
 
             @if (confirmandoExclusao() === produto.id) {
-              <div class="mt-4 space-y-3 rounded-lg border border-red-200 bg-red-50 p-3" role="alertdialog" [attr.aria-label]="'Confirmar exclusão do produto ' + produto.nome">
-                <p class="text-sm text-red-800">
+              <div class="mt-4 space-y-3 rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/40 p-3" role="alertdialog" [attr.aria-label]="'Confirmar exclusão do produto ' + produto.nome">
+                <p class="text-sm text-red-800 dark:text-red-300">
                   Excluir o produto <strong>{{ produto.nome }}</strong>? Esta ação é irreversível.
                 </p>
                 <div class="flex gap-2">
@@ -102,7 +111,7 @@
                     {{ reativando() === produto.id ? 'Reativando...' : 'Reativar' }}
                   </button>
                 }
-                <button type="button" class="botao-secundario text-red-700" (click)="pedirConfirmacao(produto.id)">Excluir</button>
+                <button type="button" class="botao-secundario text-red-700 dark:text-red-400" (click)="pedirConfirmacao(produto.id)">Excluir</button>
               </div>
             }
           </li>

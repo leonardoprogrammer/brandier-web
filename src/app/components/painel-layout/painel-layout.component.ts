@@ -6,10 +6,11 @@ import { filter, finalize } from 'rxjs';
 
 import { AuthService } from '../../services/auth.service';
 import { ConviteService } from '../../services/convite.service';
+import { TemaToggleComponent } from '../tema-toggle/tema-toggle.component';
 
 @Component({
   selector: 'app-painel-layout',
-  imports: [RouterLink, RouterLinkActive, RouterOutlet],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet, TemaToggleComponent],
   templateUrl: './painel-layout.component.html',
 })
 export class PainelLayoutComponent implements OnInit {

@@ -1,0 +1,104 @@
+<div class="tema-contentor relative inline-block">
+  <button
+    type="button"
+    class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600/40 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+    aria-haspopup="menu"
+    [attr.aria-expanded]="aberto()"
+    [attr.aria-label]="'Tema: ' + rotulo()"
+    [attr.title]="rotulo()"
+    (click)="alternar()"
+  >
+    @switch (tema()) {
+      @case ('escuro') {
+        <svg viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+        </svg>
+      }
+      @case ('claro') {
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4" aria-hidden="true">
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+        </svg>
+      }
+      @default {
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4" aria-hidden="true">
+          <rect x="3" y="4" width="18" height="12" rx="2" />
+          <path d="M8 20h8M12 16v4" />
+        </svg>
+      }
+    }
+  </button>
+
+  <div class="tema-painel absolute top-full z-10 pt-1" [class]="classesDoPainel()" [class.hidden]="!aberto()">
+    <div
+      role="menu"
+      aria-label="Tema"
+      class="flex items-center gap-0.5 rounded-full bg-white p-1 shadow-lg ring-1 ring-slate-200 dark:bg-slate-800 dark:ring-slate-700"
+      (keydown)="aoTeclarNoMenu($event)"
+    >
+      <button
+        type="button"
+        role="menuitem"
+        class="flex h-7 w-7 items-center justify-center rounded-full text-slate-500 transition hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600/40 dark:text-slate-400 dark:hover:text-slate-100"
+        [class.bg-slate-100]="tema() === 'sistema'"
+        [class.text-slate-900]="tema() === 'sistema'"
+        [class.dark:bg-slate-700]="tema() === 'sistema'"
+        [class.dark:text-slate-100]="tema() === 'sistema'"
+        [attr.aria-pressed]="tema() === 'sistema'"
+        aria-label="Tema do sistema"
+        title="Sistema"
+        (click)="escolher('sistema')"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4" aria-hidden="true">
+          <rect x="3" y="4" width="18" height="12" rx="2" />
+          <path d="M8 20h8M12 16v4" />
+        </svg>
+      </button>
+
+      <button
+        type="button"
+        role="menuitem"
+        class="flex h-7 w-7 items-center justify-center rounded-full text-slate-500 transition hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600/40 dark:text-slate-400 dark:hover:text-slate-100"
+        [class.bg-slate-100]="tema() === 'claro'"
+        [class.text-slate-900]="tema() === 'claro'"
+        [class.dark:bg-slate-700]="tema() === 'claro'"
+        [class.dark:text-slate-100]="tema() === 'claro'"
+        [attr.aria-pressed]="tema() === 'claro'"
+        aria-label="Tema claro"
+        title="Claro"
+        (click)="escolher('claro')"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4" aria-hidden="true">
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+        </svg>
+      </button>
+
+      <button
+        type="button"
+        role="menuitem"
+        class="flex h-7 w-7 items-center justify-center rounded-full text-slate-500 transition hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600/40 dark:text-slate-400 dark:hover:text-slate-100"
+        [class.bg-slate-100]="tema() === 'escuro'"
+        [class.text-slate-900]="tema() === 'escuro'"
+        [class.dark:bg-slate-700]="tema() === 'escuro'"
+        [class.dark:text-slate-100]="tema() === 'escuro'"
+        [attr.aria-pressed]="tema() === 'escuro'"
+        aria-label="Tema escuro"
+        title="Escuro"
+        (click)="escolher('escuro')"
+      >
+        <svg viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  @media (hover: hover) and (pointer: fine) {
+    .tema-contentor:hover .tema-painel {
+      display: block;
+    }
+  }
+</style>

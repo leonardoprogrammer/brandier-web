@@ -82,7 +82,7 @@ describe('ConviteComponent', () => {
     fixture.detectChanges();
 
     expect(elemento().querySelector('[role="alert"]')?.textContent).toContain('foi enviado para outro e-mail');
-    expect(elemento().querySelector('button')).toBeNull();
+    expect(elemento().querySelector('section button')).toBeNull();
   });
 
   it('aceitar envia o token e mostra a confirmação com atalho para as marcas como promotor', async () => {

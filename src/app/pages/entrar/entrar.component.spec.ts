@@ -131,7 +131,7 @@ describe('EntrarComponent', () => {
     const campo = elemento().querySelector<HTMLInputElement>('#senha')!;
     expect(campo.type).toBe('password');
 
-    elemento().querySelector<HTMLButtonElement>('button[aria-pressed]')!.click();
+    Array.from(elemento().querySelectorAll('button')).find((b) => b.textContent?.trim() === 'Mostrar')!.click();
     fixture.detectChanges();
 
     expect(campo.type).toBe('text');

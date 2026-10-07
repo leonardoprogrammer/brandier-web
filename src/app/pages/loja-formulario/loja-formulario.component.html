@@ -1,17 +1,17 @@
 <div class="mx-auto max-w-xl">
   <a [routerLink]="['/painel/marcas', marcaId, 'lojas']" class="link-discreto text-sm">&larr; Voltar para lojas</a>
 
-  <h1 class="mt-3 text-2xl font-bold tracking-tight text-slate-900">{{ edicao ? 'Editar loja' : 'Nova loja' }}</h1>
+  <h1 class="mt-3 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">{{ edicao ? 'Editar loja' : 'Nova loja' }}</h1>
 
   @if (carregando()) {
-    <p class="mt-6 text-slate-500" role="status">Carregando...</p>
+    <p class="mt-6 text-slate-500 dark:text-slate-400" role="status">Carregando...</p>
   } @else if (naoEncontrada()) {
     <div class="aviso aviso-erro mt-6 space-y-3" role="alert">
       <p>Loja não encontrada.</p>
       <a [routerLink]="['/painel/marcas', marcaId, 'lojas']" class="botao-secundario">Voltar para lojas</a>
     </div>
   } @else {
-    <form [formGroup]="form" (ngSubmit)="salvar()" novalidate class="mt-6 space-y-4 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+    <form [formGroup]="form" (ngSubmit)="salvar()" novalidate class="mt-6 space-y-4 rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700">
       @if (erro(); as mensagem) {
         <div class="aviso aviso-erro space-y-2" role="alert">
           <p>{{ mensagem }}</p>
@@ -73,7 +73,7 @@
       </div>
 
       <div>
-        <label for="endereco" class="campo-rotulo">Endereço <span class="font-normal text-slate-500">(opcional)</span></label>
+        <label for="endereco" class="campo-rotulo">Endereço <span class="font-normal text-slate-500 dark:text-slate-400">(opcional)</span></label>
         <input
           id="endereco"
           type="text"

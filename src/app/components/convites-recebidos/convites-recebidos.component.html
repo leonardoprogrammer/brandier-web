@@ -1,7 +1,7 @@
 @if (convites().length > 0 || confirmacao() || erro() || falhou()) {
   <section class="mt-6 space-y-3" aria-labelledby="titulo-convites-recebidos">
     @if (convites().length > 0) {
-      <h2 id="titulo-convites-recebidos" class="text-lg font-semibold text-slate-900">
+      <h2 id="titulo-convites-recebidos" class="text-lg font-semibold text-slate-900 dark:text-slate-100">
         {{ convites().length === 1 ? 'Você tem um convite pendente' : 'Você tem ' + convites().length + ' convites pendentes' }}
       </h2>
     }
@@ -21,12 +21,12 @@
 
     <ul class="space-y-3">
       @for (convite of convites(); track convite.id) {
-        <li class="rounded-2xl border border-indigo-200 bg-indigo-50 p-4" data-testid="convite-recebido">
-          <p class="text-sm text-slate-800">
+        <li class="rounded-2xl border border-indigo-200 dark:border-indigo-900/50 bg-indigo-50 dark:bg-indigo-950/40 p-4" data-testid="convite-recebido">
+          <p class="text-sm text-slate-800 dark:text-slate-200">
             <strong>{{ convite.gestorNome }}</strong> convidou você para ser promotor da marca
             <strong>{{ convite.marcaNome }}</strong>.
           </p>
-          <p class="mt-1 text-xs text-slate-600">Válido até {{ formatarData(convite.expiraEm) }}.</p>
+          <p class="mt-1 text-xs text-slate-600 dark:text-slate-400">Válido até {{ formatarData(convite.expiraEm) }}.</p>
           <div class="mt-3 flex flex-wrap gap-2">
             <button type="button" class="botao-primario w-auto" [disabled]="respondendo() === convite.id" (click)="aceitar(convite)">
               {{ respondendo() === convite.id ? 'Enviando...' : 'Aceitar' }}

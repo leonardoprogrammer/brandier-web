@@ -1,21 +1,24 @@
 <main class="flex min-h-screen items-center justify-center px-4 py-10">
   <div class="w-full max-w-md">
-    <a routerLink="/" class="mb-8 flex items-center justify-center gap-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600/40" aria-label="Brandier, página inicial">
-      <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-xl font-bold text-white" aria-hidden="true">B</span>
-      <span class="text-2xl font-bold tracking-tight text-slate-900">Brandier</span>
-    </a>
+    <div class="mb-8 flex items-center justify-between gap-3">
+      <a routerLink="/" class="flex items-center gap-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600/40" aria-label="Brandier, página inicial">
+        <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-xl font-bold text-white" aria-hidden="true">B</span>
+        <span class="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Brandier</span>
+      </a>
+      <app-tema-toggle [abrirAEsquerdaNoMobile]="true" />
+    </div>
 
-    <section class="rounded-2xl bg-white p-6 shadow-lg ring-1 ring-slate-200 sm:p-8">
-      <h1 class="text-2xl font-bold tracking-tight text-slate-900">{{ titulo() }}</h1>
+    <section class="rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-lg ring-1 ring-slate-200 dark:ring-slate-700 sm:p-8">
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">{{ titulo() }}</h1>
       @if (subtitulo()) {
-        <p class="mt-1 text-sm text-slate-600">{{ subtitulo() }}</p>
+        <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">{{ subtitulo() }}</p>
       }
       <div class="mt-6">
         <ng-content />
       </div>
     </section>
 
-    <p class="mt-6 text-center text-xs text-slate-500">
+    <p class="mt-6 text-center text-xs text-slate-500 dark:text-slate-400">
       Projeto de portfólio, não é para uso comercial.
       <a routerLink="/como-funciona" class="link-discreto">Como funciona</a> ·
       <a routerLink="/sobre" class="link-discreto">Sobre o projeto</a>

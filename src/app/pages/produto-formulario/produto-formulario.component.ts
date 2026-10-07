@@ -9,6 +9,7 @@ import { semSoEspacos } from '../../validators/texto.validator';
 
 const NOME_TAMANHO_MAXIMO = 80;
 const CODIGO_TAMANHO_MAXIMO = 40;
+const COR_PADRAO = '#6366f1';
 
 type CampoProduto = 'nome' | 'codigo';
 
@@ -31,6 +32,8 @@ export class ProdutoFormularioComponent implements OnInit {
   protected readonly form = this.formBuilder.group({
     nome: ['', [Validators.required, Validators.maxLength(NOME_TAMANHO_MAXIMO), semSoEspacos]],
     codigo: ['', [Validators.maxLength(CODIGO_TAMANHO_MAXIMO)]],
+    temCor: [false],
+    cor: [COR_PADRAO],
   });
 
   protected readonly carregando = signal(this.id !== null);
@@ -48,7 +51,13 @@ export class ProdutoFormularioComponent implements OnInit {
       .buscar(this.marcaId, this.id)
       .pipe(finalize(() => this.carregando.set(false)))
       .subscribe({
-        next: (produto) => this.form.setValue({ nome: produto.nome, codigo: produto.codigo ?? '' }),
+        next: (produto) =>
+          this.form.setValue({
+            nome: produto.nome,
+            codigo: produto.codigo ?? '',
+            temCor: produto.cor !== null,
+            cor: produto.cor ?? COR_PADRAO,
+          }),
         error: (erro: unknown) => {
           if (extrairProblema(erro).status === 404) {
             this.naoEncontrado.set(true);
@@ -65,8 +74,8 @@ export class ProdutoFormularioComponent implements OnInit {
       return;
     }
 
-    const { nome, codigo } = this.form.getRawValue();
-    const dados = { nome: nome.trim(), codigo: codigo.trim() };
+    const { nome, codigo, temCor, cor } = this.form.getRawValue();
+    const dados = { nome: nome.trim(), codigo: codigo.trim(), cor: temCor ? cor : null };
     const requisicao =
       this.id === null
         ? this.produtoService.criar(this.marcaId, dados)

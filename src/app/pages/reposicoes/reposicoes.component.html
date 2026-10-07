@@ -10,10 +10,10 @@
 } @else {
   <header class="mt-3 flex flex-wrap items-start justify-between gap-4">
     <div>
-      <h1 class="text-2xl font-bold tracking-tight text-slate-900">
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
         {{ daMarca ? 'Reposições da marca' : 'Minhas reposições' }}
       </h1>
-      <p class="mt-1 text-slate-600">
+      <p class="mt-1 text-slate-600 dark:text-slate-400">
         @if (daMarca) {
           @if (marcaNome()) {
             Tudo o que foi reposto nas lojas de <strong>{{ marcaNome() }}</strong>.
@@ -35,7 +35,7 @@
 
   <div class="mt-6">
     @if (carregando() && !dados()) {
-      <p class="text-slate-500" role="status">Carregando reposições...</p>
+      <p class="text-slate-500 dark:text-slate-400" role="status">Carregando reposições...</p>
     } @else if (falhou()) {
       <div class="aviso aviso-erro space-y-3" role="alert">
         <p>Não foi possível carregar as reposições.</p>
@@ -43,19 +43,19 @@
       </div>
     } @else if (dados(); as pagina) {
       @if (pagina.conteudo.length === 0) {
-        <div class="rounded-2xl border-2 border-dashed border-slate-300 bg-white p-10 text-center">
-          <h2 class="text-lg font-semibold text-slate-900">Nenhuma reposição registrada</h2>
-          <p class="mt-2 text-slate-600">Registre a primeira reposição para acompanhar o que foi reposto nas lojas.</p>
+        <div class="rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 p-10 text-center">
+          <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Nenhuma reposição registrada</h2>
+          <p class="mt-2 text-slate-600 dark:text-slate-400">Registre a primeira reposição para acompanhar o que foi reposto nas lojas.</p>
           <a routerLink="/painel/reposicoes/nova" [queryParams]="linkNova()" class="botao-primario mx-auto mt-5 w-auto">Registrar reposição</a>
         </div>
       } @else {
         <ul class="grid gap-4" [attr.aria-busy]="carregando()">
           @for (reposicao of pagina.conteudo; track reposicao.id) {
-            <li class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200" data-testid="reposicao">
+            <li class="rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700" data-testid="reposicao">
               <div class="flex flex-wrap items-start justify-between gap-2">
                 <div>
-                  <h2 class="text-lg font-semibold text-slate-900">{{ reposicao.lojaNome }}</h2>
-                  <p class="text-sm text-slate-600">
+                  <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">{{ reposicao.lojaNome }}</h2>
+                  <p class="text-sm text-slate-600 dark:text-slate-400">
                     @if (!daMarca) {
                       {{ reposicao.marcaNome }} ·
                     }
@@ -65,19 +65,19 @@
                     }
                   </p>
                 </div>
-                <span class="rounded-full bg-indigo-50 px-3 py-1 text-sm font-medium text-indigo-700" data-testid="total-unidades">
+                <span class="rounded-full bg-indigo-50 dark:bg-indigo-950/40 px-3 py-1 text-sm font-medium text-indigo-700 dark:text-indigo-300" data-testid="total-unidades">
                   {{ reposicao.totalUnidades }} {{ reposicao.totalUnidades === 1 ? 'unidade' : 'unidades' }}
                 </span>
               </div>
 
-              <p class="mt-3 text-sm text-slate-700" data-testid="itens">{{ resumoDosItens(reposicao) }}</p>
+              <p class="mt-3 text-sm text-slate-700 dark:text-slate-300" data-testid="itens">{{ resumoDosItens(reposicao) }}</p>
               @if (reposicao.observacoes) {
-                <p class="mt-2 text-sm text-slate-500">{{ reposicao.observacoes }}</p>
+                <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">{{ reposicao.observacoes }}</p>
               }
 
               @if (confirmando() === reposicao.id) {
-                <div class="mt-4 space-y-3 rounded-lg border border-red-200 bg-red-50 p-3" role="alertdialog" [attr.aria-label]="'Confirmar exclusão da reposição em ' + reposicao.lojaNome">
-                  <p class="text-sm text-red-800">Excluir esta reposição? Esta ação é irreversível.</p>
+                <div class="mt-4 space-y-3 rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/40 p-3" role="alertdialog" [attr.aria-label]="'Confirmar exclusão da reposição em ' + reposicao.lojaNome">
+                  <p class="text-sm text-red-800 dark:text-red-300">Excluir esta reposição? Esta ação é irreversível.</p>
                   <div class="flex gap-2">
                     <button type="button" class="botao-secundario" [disabled]="excluindo() === reposicao.id" (click)="cancelarExclusao()">Cancelar</button>
                     <button
@@ -93,13 +93,13 @@
               } @else if (reposicao.podeEditar) {
                 <div class="mt-4 flex flex-wrap items-center gap-2">
                   <a [routerLink]="['/painel/reposicoes', reposicao.marcaId, reposicao.id]" class="botao-secundario">Editar</a>
-                  <button type="button" class="botao-secundario text-red-700" (click)="pedirConfirmacao(reposicao.id)">Excluir</button>
+                  <button type="button" class="botao-secundario text-red-700 dark:text-red-400" (click)="pedirConfirmacao(reposicao.id)">Excluir</button>
                   @if (reposicao.editavelAte) {
-                    <span class="text-xs text-slate-500" data-testid="prazo">Editável até {{ formatarDataHora(reposicao.editavelAte) }}</span>
+                    <span class="text-xs text-slate-500 dark:text-slate-400" data-testid="prazo">Editável até {{ formatarDataHora(reposicao.editavelAte) }}</span>
                   }
                 </div>
               } @else if (prazoEncerrado(reposicao)) {
-                <p class="mt-4 text-xs text-slate-500" data-testid="prazo-encerrado">
+                <p class="mt-4 text-xs text-slate-500 dark:text-slate-400" data-testid="prazo-encerrado">
                   O prazo de edição terminou. Para alterar este registro, fale com o gestor da marca.
                 </p>
               }
@@ -110,7 +110,7 @@
         @if (pagina.totalPaginas > 1) {
           <nav class="mt-6 flex items-center justify-between gap-3" aria-label="Paginação">
             <button type="button" class="botao-secundario" [disabled]="carregando() || pagina.pagina === 0" (click)="paginaAnterior()">Anterior</button>
-            <span class="text-sm text-slate-600" data-testid="pagina-atual">Página {{ pagina.pagina + 1 }} de {{ pagina.totalPaginas }}</span>
+            <span class="text-sm text-slate-600 dark:text-slate-400" data-testid="pagina-atual">Página {{ pagina.pagina + 1 }} de {{ pagina.totalPaginas }}</span>
             <button type="button" class="botao-secundario" [disabled]="carregando() || pagina.pagina + 1 >= pagina.totalPaginas" (click)="proximaPagina()">Próxima</button>
           </nav>
         }

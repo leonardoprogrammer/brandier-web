@@ -8,8 +8,8 @@
 } @else {
   <header class="mt-3 flex flex-wrap items-start justify-between gap-4">
     <div>
-      <h1 class="text-2xl font-bold tracking-tight text-slate-900">Promotores</h1>
-      <p class="mt-1 text-slate-600">
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Promotores</h1>
+      <p class="mt-1 text-slate-600 dark:text-slate-400">
         @if (marcaNome()) {
           Quem pode registrar reposições na marca <strong>{{ marcaNome() }}</strong>.
         } @else {
@@ -19,23 +19,23 @@
     </div>
 
     @if (dados(); as resumo) {
-      <span class="rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700" data-testid="uso-promotores">
+      <span class="rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1 text-sm font-medium text-slate-700 dark:text-slate-300" data-testid="uso-promotores">
         {{ resumo.usadas }}/{{ resumo.limite }} promotores
       </span>
     }
   </header>
 
   @if (carregando()) {
-    <p class="mt-6 text-slate-500" role="status">Carregando promotores...</p>
+    <p class="mt-6 text-slate-500 dark:text-slate-400" role="status">Carregando promotores...</p>
   } @else if (falhou()) {
     <div class="aviso aviso-erro mt-6 space-y-3" role="alert">
       <p>Não foi possível carregar os promotores.</p>
       <button type="button" class="botao-secundario" (click)="carregar()">Tentar de novo</button>
     </div>
   } @else if (dados(); as resumo) {
-    <section class="mt-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200" aria-labelledby="titulo-convidar">
-      <h2 id="titulo-convidar" class="text-lg font-semibold text-slate-900">Convidar promotor</h2>
-      <p class="mt-1 text-sm text-slate-600">
+    <section class="mt-6 rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700" aria-labelledby="titulo-convidar">
+      <h2 id="titulo-convidar" class="text-lg font-semibold text-slate-900 dark:text-slate-100">Convidar promotor</h2>
+      <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">
         A pessoa recebe um e-mail com o convite e precisa de uma conta com esse mesmo e-mail para aceitar. Convites
         pendentes ocupam uma vaga até serem respondidos ou expirarem.
       </p>
@@ -84,31 +84,31 @@
     }
 
     <section class="mt-8" aria-labelledby="titulo-promotores">
-      <h2 id="titulo-promotores" class="text-lg font-semibold text-slate-900">Promotores da marca</h2>
+      <h2 id="titulo-promotores" class="text-lg font-semibold text-slate-900 dark:text-slate-100">Promotores da marca</h2>
 
       @if (resumo.promotores.length === 0) {
-        <p class="mt-3 rounded-2xl border-2 border-dashed border-slate-300 bg-white p-6 text-center text-slate-600">
+        <p class="mt-3 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 p-6 text-center text-slate-600 dark:text-slate-400">
           Esta marca ainda não tem promotores.
         </p>
       } @else {
         <ul class="mt-3 grid gap-3">
           @for (promotor of resumo.promotores; track promotor.id) {
-            <li class="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200" data-testid="promotor">
+            <li class="rounded-2xl bg-white dark:bg-slate-900 p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700" data-testid="promotor">
               <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p class="font-semibold text-slate-900">{{ promotor.nome }}</p>
-                  <p class="text-sm text-slate-600">{{ promotor.email }}</p>
-                  <p class="text-xs text-slate-500">Desde {{ formatarData(promotor.entrouEm) }}</p>
+                  <p class="font-semibold text-slate-900 dark:text-slate-100">{{ promotor.nome }}</p>
+                  <p class="text-sm text-slate-600 dark:text-slate-400">{{ promotor.email }}</p>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">Desde {{ formatarData(promotor.entrouEm) }}</p>
                 </div>
 
                 @if (confirmando() !== promotor.id) {
-                  <button type="button" class="botao-secundario text-red-700" (click)="pedirConfirmacao(promotor.id)">Remover</button>
+                  <button type="button" class="botao-secundario text-red-700 dark:text-red-400" (click)="pedirConfirmacao(promotor.id)">Remover</button>
                 }
               </div>
 
               @if (confirmando() === promotor.id) {
-                <div class="mt-3 space-y-3 rounded-lg border border-red-200 bg-red-50 p-3" role="alertdialog" [attr.aria-label]="'Confirmar remoção de ' + promotor.nome">
-                  <p class="text-sm text-red-800">
+                <div class="mt-3 space-y-3 rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/40 p-3" role="alertdialog" [attr.aria-label]="'Confirmar remoção de ' + promotor.nome">
+                  <p class="text-sm text-red-800 dark:text-red-300">
                     Remover <strong>{{ promotor.nome }}</strong> da marca? As reposições já registradas serão mantidas.
                   </p>
                   <div class="flex gap-2">
@@ -132,14 +132,14 @@
 
     @if (resumo.convites.length > 0) {
       <section class="mt-8" aria-labelledby="titulo-convites">
-        <h2 id="titulo-convites" class="text-lg font-semibold text-slate-900">Convites</h2>
+        <h2 id="titulo-convites" class="text-lg font-semibold text-slate-900 dark:text-slate-100">Convites</h2>
         <ul class="mt-3 grid gap-3">
           @for (convite of resumo.convites; track convite.id) {
-            <li class="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200" data-testid="convite">
+            <li class="rounded-2xl bg-white dark:bg-slate-900 p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700" data-testid="convite">
               <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p class="font-medium text-slate-900">{{ convite.email }}</p>
-                  <p class="text-xs text-slate-500">
+                  <p class="font-medium text-slate-900 dark:text-slate-100">{{ convite.email }}</p>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">
                     <span class="font-semibold" data-testid="status-convite">{{ rotuloDoStatus(convite.status) }}</span>
                     @if (convite.status === 'PENDENTE') {
                       · expira em {{ formatarData(convite.expiraEm) }}
@@ -157,8 +157,8 @@
               </div>
 
               @if (confirmando() === convite.id) {
-                <div class="mt-3 space-y-3 rounded-lg border border-red-200 bg-red-50 p-3" role="alertdialog" [attr.aria-label]="'Confirmar remoção do convite para ' + convite.email">
-                  <p class="text-sm text-red-800">
+                <div class="mt-3 space-y-3 rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/40 p-3" role="alertdialog" [attr.aria-label]="'Confirmar remoção do convite para ' + convite.email">
+                  <p class="text-sm text-red-800 dark:text-red-300">
                     @if (podeCancelar(convite)) {
                       Cancelar o convite para <strong>{{ convite.email }}</strong>? O link enviado deixa de funcionar.
                     } @else {

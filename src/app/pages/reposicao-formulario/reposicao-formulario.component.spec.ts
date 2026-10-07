@@ -26,9 +26,9 @@ describe('ReposicaoFormularioComponent', () => {
   };
   const produtos: ProdutosDaMarca = {
     produtos: [
-      { id: 'p1', nome: 'Sabonete', codigo: null, ativo: true, criadoEm: '2026-01-01T00:00:00Z' },
-      { id: 'p2', nome: 'Shampoo', codigo: null, ativo: true, criadoEm: '2026-01-01T00:00:00Z' },
-      { id: 'p3', nome: 'Antigo', codigo: null, ativo: false, criadoEm: '2026-01-01T00:00:00Z' },
+      { id: 'p1', nome: 'Sabonete', codigo: null, cor: null, ativo: true, criadoEm: '2026-01-01T00:00:00Z' },
+      { id: 'p2', nome: 'Shampoo', codigo: null, cor: '#4f46e5', ativo: true, criadoEm: '2026-01-01T00:00:00Z' },
+      { id: 'p3', nome: 'Antigo', codigo: null, cor: null, ativo: false, criadoEm: '2026-01-01T00:00:00Z' },
     ],
     limite: 10,
   };
@@ -312,6 +312,28 @@ describe('ReposicaoFormularioComponent', () => {
         expect(produtosNaTela).toEqual(['Selecione o produto', 'Sabonete', 'Shampoo']);
       });
 
+      it('mostra a cor de fundo na opção do produto que tem cor cadastrada', () => {
+        botao('Adicionar produto').click();
+        fixture.detectChanges();
+        const opcoes = Array.from(campo<HTMLSelectElement>('#produto-0').options);
+
+        expect(opcoes.find((o) => o.textContent?.trim() === 'Sabonete')?.style.backgroundColor).toBe('');
+        expect(opcoes.find((o) => o.textContent?.trim() === 'Shampoo')?.style.backgroundColor).toBe('rgb(79, 70, 229)');
+      });
+
+      it('mostra um círculo com a cor do produto escolhido e some quando o produto não tem cor', () => {
+        botao('Adicionar produto').click();
+        fixture.detectChanges();
+
+        expect(campo('[data-testid="cor-item"]')).toBeNull();
+
+        selecionar('#produto-0', 'p2');
+        expect(campo<HTMLElement>('[data-testid="cor-item"]').style.backgroundColor).toBe('rgb(79, 70, 229)');
+
+        selecionar('#produto-0', 'p1');
+        expect(campo('[data-testid="cor-item"]')).toBeNull();
+      });
+
       it('traz a data e a hora atuais por padrão', () => {
         const valor = campo<HTMLInputElement>('#reposto-em').value;
 
@@ -511,6 +533,15 @@ describe('ReposicaoFormularioComponent', () => {
       expect(campo<HTMLInputElement>('#quantidade-0').value).toBe('10');
       expect(campo<HTMLSelectElement>('#produto-1').value).toBe('p3');
       expect(botao('Salvar alterações')).toBeDefined();
+    });
+
+    it('mostra o círculo de cor também ao editar um item que já tem produto com cor', async () => {
+      await iniciarEdicao({
+        ...reposicaoExistente,
+        itens: [{ produtoId: 'p2', produtoNome: 'Shampoo', quantidade: 5 }],
+      });
+
+      expect(campo<HTMLElement>('[data-testid="cor-item"]').style.backgroundColor).toBe('rgb(79, 70, 229)');
     });
 
     it('mostra até quando o promotor pode editar', async () => {

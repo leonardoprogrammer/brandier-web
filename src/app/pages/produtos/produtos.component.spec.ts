@@ -11,8 +11,8 @@ import { ProdutosComponent } from './produtos.component';
 
 describe('ProdutosComponent', () => {
   const marca: Marca = { id: 'm1', nome: 'Alfa', descricao: null, ativa: true, criadoEm: '2026-01-01T00:00:00Z' };
-  const sabonete: Produto = { id: 'p1', nome: 'Sabonete', codigo: 'SKU-1', ativo: true, criadoEm: '2026-01-01T00:00:00Z' };
-  const shampoo: Produto = { id: 'p2', nome: 'Shampoo', codigo: null, ativo: true, criadoEm: '2026-01-02T00:00:00Z' };
+  const sabonete: Produto = { id: 'p1', nome: 'Sabonete', codigo: 'SKU-1', cor: null, ativo: true, criadoEm: '2026-01-01T00:00:00Z' };
+  const shampoo: Produto = { id: 'p2', nome: 'Shampoo', codigo: null, cor: null, ativo: true, criadoEm: '2026-01-02T00:00:00Z' };
   let fixture: ComponentFixture<ProdutosComponent>;
   let produtoService: jasmine.SpyObj<ProdutoService>;
   let marcaService: jasmine.SpyObj<MarcaService>;
@@ -198,7 +198,7 @@ describe('ProdutosComponent', () => {
     botao('Reativar').click();
     fixture.detectChanges();
 
-    expect(produtoService.atualizar).toHaveBeenCalledWith('m1', 'p2', { nome: 'Shampoo', codigo: '', ativo: true });
+    expect(produtoService.atualizar).toHaveBeenCalledWith('m1', 'p2', { nome: 'Shampoo', codigo: '', cor: null, ativo: true });
     expect(elemento().querySelector('[data-testid="selo-inativo"]')).toBeNull();
     expect(elemento().querySelector('[data-testid="uso-produtos"]')?.textContent?.trim()).toBe('2/10 produtos ativos');
   });

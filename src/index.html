@@ -8,8 +8,19 @@
   <meta name="description" content="Brandier: plataforma de gestão de promotores de marca. Projeto de portfólio, sem fins comerciais.">
   <meta name="referrer" content="same-origin">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <script>
+    (function () {
+      try {
+        var tema = localStorage.getItem('brandier-tema') || 'sistema';
+        var escuro = tema === 'escuro' || (tema === 'sistema' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        if (escuro) {
+          document.documentElement.classList.add('dark');
+        }
+      } catch (e) {}
+    })();
+  </script>
 </head>
-<body class="bg-slate-50 text-slate-900 antialiased">
+<body class="bg-slate-50 text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100">
   <app-root></app-root>
 </body>
 </html>

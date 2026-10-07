@@ -1,17 +1,17 @@
-<section class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
-  <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-500">{{ titulo() }}</h3>
+<section class="rounded-2xl bg-white dark:bg-slate-900 p-5 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700">
+  <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ titulo() }}</h3>
 
   @if (visiveis().length === 0) {
-    <p class="mt-3 text-sm text-slate-500" data-testid="ranking-vazio">Sem dados no período.</p>
+    <p class="mt-3 text-sm text-slate-500 dark:text-slate-400" data-testid="ranking-vazio">Sem dados no período.</p>
   } @else {
     <ol class="mt-3 space-y-3">
       @for (item of visiveis(); track item.id) {
         <li data-testid="ranking-item">
           <div class="flex items-baseline justify-between gap-3 text-sm">
-            <span class="truncate font-medium text-slate-800">{{ item.nome }}</span>
-            <span class="shrink-0 text-slate-600">{{ item.valor }} {{ unidade() }}@if (item.detalhe) { · {{ item.detalhe }} }</span>
+            <span class="truncate font-medium text-slate-800 dark:text-slate-200">{{ item.nome }}</span>
+            <span class="shrink-0 text-slate-600 dark:text-slate-400">{{ item.valor }} {{ unidade() }}@if (item.detalhe) { · {{ item.detalhe }} }</span>
           </div>
-          <div class="mt-1 h-2 rounded-full bg-slate-100" aria-hidden="true">
+          <div class="mt-1 h-2 rounded-full bg-slate-100 dark:bg-slate-800" aria-hidden="true">
             <div class="h-2 rounded-full bg-indigo-500" [style.width.%]="largura(item.valor)"></div>
           </div>
         </li>

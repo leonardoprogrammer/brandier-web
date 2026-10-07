@@ -6,8 +6,8 @@ import { Produto, ProdutosDaMarca } from '../models/produto.model';
 import { ProdutoService } from './produto.service';
 
 describe('ProdutoService', () => {
-  const produto: Produto = { id: 'p1', nome: 'Sabonete', codigo: null, ativo: true, criadoEm: '2026-01-01T12:00:00Z' };
-  const dados = { nome: 'Sabonete', codigo: '' };
+  const produto: Produto = { id: 'p1', nome: 'Sabonete', codigo: null, cor: null, ativo: true, criadoEm: '2026-01-01T12:00:00Z' };
+  const dados = { nome: 'Sabonete', codigo: '', cor: null };
   let service: ProdutoService;
   let http: HttpTestingController;
 

@@ -35,6 +35,7 @@ export interface OpcaoMarca {
 export interface OpcaoProduto {
   id: string;
   nome: string;
+  cor: string | null;
 }
 
 type ItemForm = FormGroup<{ produtoId: FormControl<string>; quantidade: FormControl<number | null> }>;
@@ -182,6 +183,14 @@ export class ReposicaoFormularioComponent implements OnInit {
         .map((item) => item.controls.produtoId.value),
     );
     return this.produtos().filter((produto) => !escolhidosNosOutros.has(produto.id));
+  }
+
+  protected corDoItem(indice: number): string | null {
+    const produtoId = this.itens.at(indice).controls.produtoId.value;
+    if (!produtoId) {
+      return null;
+    }
+    return this.produtos().find((produto) => produto.id === produtoId)?.cor ?? null;
   }
 
   protected podeAdicionarItem(): boolean {
@@ -343,8 +352,12 @@ export class ReposicaoFormularioComponent implements OnInit {
           const opcoes = new Map<string, OpcaoProduto>();
           produtos.produtos
             .filter((produto) => produto.ativo)
-            .forEach((produto) => opcoes.set(produto.id, { id: produto.id, nome: produto.nome }));
-          existentes.forEach((produto) => opcoes.set(produto.id, produto));
+            .forEach((produto) => opcoes.set(produto.id, { id: produto.id, nome: produto.nome, cor: produto.cor }));
+          existentes.forEach((produto) => {
+            if (!opcoes.has(produto.id)) {
+              opcoes.set(produto.id, produto);
+            }
+          });
           this.produtos.set([...opcoes.values()].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR')));
           if (lojaInicial) {
             this.form.controls.lojaId.setValue(lojaInicial);
@@ -355,7 +368,7 @@ export class ReposicaoFormularioComponent implements OnInit {
   }
 
   private opcoesDosItensExistentes(): OpcaoProduto[] {
-    return (this.reposicao()?.itens ?? []).map((item) => ({ id: item.produtoId, nome: item.produtoNome }));
+    return (this.reposicao()?.itens ?? []).map((item) => ({ id: item.produtoId, nome: item.produtoNome, cor: null }));
   }
 
   private novoItem(produtoId: string, quantidade: number): ItemForm {

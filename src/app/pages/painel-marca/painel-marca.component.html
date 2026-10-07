@@ -8,10 +8,10 @@
 } @else {
   <header class="mt-3 flex flex-wrap items-start justify-between gap-4">
     <div>
-      <h1 class="text-2xl font-bold tracking-tight text-slate-900">
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
         Painel{{ painel() ? ' de ' + painel()?.marcaNome : ' da marca' }}
       </h1>
-      <p class="mt-1 text-slate-600">Reposições por loja, promotor e produto no período escolhido.</p>
+      <p class="mt-1 text-slate-600 dark:text-slate-400">Reposições por loja, promotor e produto no período escolhido.</p>
     </div>
     <div class="flex flex-wrap gap-2">
       <a [routerLink]="['/painel/marcas', marcaId, 'reposicoes']" class="botao-secundario">Reposições</a>
@@ -24,7 +24,7 @@
   </div>
 
   @if (carregando() && !painel()) {
-    <p class="mt-6 text-slate-500" role="status">Carregando...</p>
+    <p class="mt-6 text-slate-500 dark:text-slate-400" role="status">Carregando...</p>
   } @else if (falhou()) {
     <div class="aviso aviso-erro mt-6 space-y-3" role="alert">
       <p>Não foi possível carregar o painel da marca.</p>
@@ -32,13 +32,13 @@
     </div>
   } @else if (painel(); as dados) {
     <div class="mt-6 grid gap-4 sm:grid-cols-2">
-      <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
-        <p class="text-sm text-slate-500">Reposições no período</p>
-        <p class="mt-1 text-3xl font-bold text-slate-900" data-testid="total-reposicoes">{{ dados.totais.reposicoes }}</p>
+      <div class="rounded-2xl bg-white dark:bg-slate-900 p-5 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700">
+        <p class="text-sm text-slate-500 dark:text-slate-400">Reposições no período</p>
+        <p class="mt-1 text-3xl font-bold text-slate-900 dark:text-slate-100" data-testid="total-reposicoes">{{ dados.totais.reposicoes }}</p>
       </div>
-      <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
-        <p class="text-sm text-slate-500">Unidades repostas</p>
-        <p class="mt-1 text-3xl font-bold text-slate-900" data-testid="total-unidades">{{ dados.totais.unidades }}</p>
+      <div class="rounded-2xl bg-white dark:bg-slate-900 p-5 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700">
+        <p class="text-sm text-slate-500 dark:text-slate-400">Unidades repostas</p>
+        <p class="mt-1 text-3xl font-bold text-slate-900 dark:text-slate-100" data-testid="total-unidades">{{ dados.totais.unidades }}</p>
       </div>
     </div>
 
@@ -48,10 +48,10 @@
       <app-ranking titulo="Por produto" [itens]="ranking(dados.porProduto)" [limite]="10" />
     </div>
 
-    <section class="mt-6 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-labelledby="titulo-sem-atividade">
-      <h2 id="titulo-sem-atividade" class="text-sm font-semibold uppercase tracking-wide text-slate-500">Promotores sem atividade no período</h2>
+    <section class="mt-6 rounded-2xl bg-white dark:bg-slate-900 p-5 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700" aria-labelledby="titulo-sem-atividade">
+      <h2 id="titulo-sem-atividade" class="text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Promotores sem atividade no período</h2>
       @if (dados.promotoresSemAtividade.length === 0) {
-        <p class="mt-3 text-sm text-slate-600" data-testid="sem-atividade-vazio">
+        <p class="mt-3 text-sm text-slate-600 dark:text-slate-400" data-testid="sem-atividade-vazio">
           @if (dados.uso.promotores === 0) {
             Esta marca ainda não tem promotores.
           } @else {
@@ -59,20 +59,20 @@
           }
         </p>
       } @else {
-        <ul class="mt-3 divide-y divide-slate-100">
+        <ul class="mt-3 divide-y divide-slate-100 dark:divide-slate-800">
           @for (promotor of dados.promotoresSemAtividade; track promotor.id) {
             <li class="py-2 text-sm" data-testid="promotor-inativo">
-              <span class="font-medium text-slate-800">{{ promotor.nome }}</span>
-              <span class="text-slate-500"> · {{ promotor.email }} · desde {{ formatarData(promotor.entrouEm) }}</span>
+              <span class="font-medium text-slate-800 dark:text-slate-200">{{ promotor.nome }}</span>
+              <span class="text-slate-500 dark:text-slate-400"> · {{ promotor.email }} · desde {{ formatarData(promotor.entrouEm) }}</span>
             </li>
           }
         </ul>
       }
     </section>
 
-    <section class="mt-6 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-labelledby="titulo-uso">
-      <h2 id="titulo-uso" class="text-sm font-semibold uppercase tracking-wide text-slate-500">Uso dos limites</h2>
-      <ul class="mt-3 grid gap-2 text-sm text-slate-700 sm:grid-cols-3" data-testid="uso">
+    <section class="mt-6 rounded-2xl bg-white dark:bg-slate-900 p-5 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700" aria-labelledby="titulo-uso">
+      <h2 id="titulo-uso" class="text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Uso dos limites</h2>
+      <ul class="mt-3 grid gap-2 text-sm text-slate-700 dark:text-slate-300 sm:grid-cols-3" data-testid="uso">
         <li>Lojas: <strong>{{ dados.uso.lojas }}/{{ dados.uso.limiteLojas }}</strong></li>
         <li>Produtos ativos: <strong>{{ dados.uso.produtos }}/{{ dados.uso.limiteProdutos }}</strong></li>
         <li>Promotores: <strong>{{ dados.uso.promotores }}/{{ dados.uso.limitePromotores }}</strong></li>

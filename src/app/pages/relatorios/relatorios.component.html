@@ -1,24 +1,24 @@
 <header>
-  <h1 class="text-2xl font-bold tracking-tight text-slate-900">Relatórios</h1>
-  <p class="mt-1 text-slate-600">Consulte as reposições com filtros, ordene e exporte para planilha.</p>
+  <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Relatórios</h1>
+  <p class="mt-1 text-slate-600 dark:text-slate-400">Consulte as reposições com filtros, ordene e exporte para planilha.</p>
 </header>
 
 @if (carregandoMarcas()) {
-  <p class="mt-6 text-slate-500" role="status">Carregando...</p>
+  <p class="mt-6 text-slate-500 dark:text-slate-400" role="status">Carregando...</p>
 } @else if (falhouMarcas()) {
   <div class="aviso aviso-erro mt-6 space-y-3" role="alert">
     <p>Não foi possível carregar as suas marcas.</p>
     <button type="button" class="botao-secundario" (click)="carregarMarcas()">Tentar de novo</button>
   </div>
 } @else if (marcas().length === 0) {
-  <div class="mt-6 rounded-2xl border-2 border-dashed border-slate-300 bg-white p-10 text-center" data-testid="sem-marcas">
-    <h2 class="text-lg font-semibold text-slate-900">Nada para consultar ainda</h2>
-    <p class="mt-2 text-slate-600">
+  <div class="mt-6 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 p-10 text-center" data-testid="sem-marcas">
+    <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Nada para consultar ainda</h2>
+    <p class="mt-2 text-slate-600 dark:text-slate-400">
       Crie uma marca como gestor ou aceite o convite de um gestor para ser promotor de uma marca.
     </p>
   </div>
 } @else {
-  <section class="mt-6 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="Filtros">
+  <section class="mt-6 rounded-2xl bg-white dark:bg-slate-900 p-5 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700" aria-label="Filtros">
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <div>
         <label for="filtro-marca" class="campo-rotulo">Marca</label>
@@ -71,13 +71,13 @@
         <app-seletor-periodo [permitirTodo]="true" (periodoAlterado)="alterarPeriodo($event)" (todoPeriodo)="removerPeriodo()" />
       </div>
       @if (!ehGestor()) {
-        <p class="mt-3 text-xs text-slate-500" data-testid="aviso-promotor">Como promotor, você vê apenas as reposições registradas por você.</p>
+        <p class="mt-3 text-xs text-slate-500 dark:text-slate-400" data-testid="aviso-promotor">Como promotor, você vê apenas as reposições registradas por você.</p>
       }
     }
   </section>
 
   @if (!marcaId()) {
-    <p class="mt-6 text-slate-600" data-testid="escolha-marca">Escolha uma marca para ver o relatório.</p>
+    <p class="mt-6 text-slate-600 dark:text-slate-400" data-testid="escolha-marca">Escolha uma marca para ver o relatório.</p>
   } @else if (falhouContexto()) {
     <div class="aviso aviso-erro mt-6 space-y-3" role="alert" data-testid="erro-contexto">
       <p>Não foi possível carregar os filtros da marca.</p>
@@ -90,13 +90,13 @@
     </div>
   } @else if (dados(); as relatorio) {
     <div class="mt-6 flex flex-wrap items-center justify-between gap-3">
-      <p class="text-sm text-slate-700" data-testid="resumo">
+      <p class="text-sm text-slate-700 dark:text-slate-300" data-testid="resumo">
         <strong>{{ relatorio.totalElementos }}</strong> {{ relatorio.totalElementos === 1 ? 'reposição' : 'reposições' }} ·
         <strong>{{ relatorio.totais.unidades }}</strong> {{ relatorio.totais.unidades === 1 ? 'unidade' : 'unidades' }}
       </p>
       <div class="flex flex-wrap items-center gap-3">
         @if (grandeDemaisParaExportar()) {
-          <span class="text-xs text-amber-700" data-testid="aviso-exportacao">Refine os filtros para exportar (máximo de {{ maximoNoCsv }} reposições).</span>
+          <span class="text-xs text-amber-700 dark:text-amber-400" data-testid="aviso-exportacao">Refine os filtros para exportar (máximo de {{ maximoNoCsv }} reposições).</span>
         }
         @if (exportacaoPermitida()) {
           <a [href]="urlDoCsv()" download class="botao-secundario" data-testid="exportar">Exportar CSV</a>
@@ -107,13 +107,13 @@
     </div>
 
     @if (relatorio.conteudo.length === 0) {
-      <div class="mt-4 rounded-2xl border-2 border-dashed border-slate-300 bg-white p-10 text-center" data-testid="vazio">
-        <p class="text-slate-600">Nenhuma reposição encontrada com esses filtros.</p>
+      <div class="mt-4 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 p-10 text-center" data-testid="vazio">
+        <p class="text-slate-600 dark:text-slate-400">Nenhuma reposição encontrada com esses filtros.</p>
       </div>
     } @else {
-      <div class="mt-4 overflow-x-auto rounded-2xl bg-white shadow-sm ring-1 ring-slate-200" [attr.aria-busy]="carregando()">
+      <div class="mt-4 overflow-x-auto rounded-2xl bg-white dark:bg-slate-900 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700" [attr.aria-busy]="carregando()">
         <table class="min-w-full text-left text-sm">
-          <thead class="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
+          <thead class="border-b border-slate-200 dark:border-slate-700 text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">
             <tr>
               <th scope="col" class="px-4 py-3" [attr.aria-sort]="sentidoDe('data')">
                 <button type="button" class="font-semibold uppercase" (click)="ordenarPor('data')">Data e hora</button>
@@ -129,14 +129,14 @@
               <th scope="col" class="px-4 py-3"><span class="sr-only">Ações</span></th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-100">
+          <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
             @for (reposicao of relatorio.conteudo; track reposicao.id) {
               <tr data-testid="linha">
-                <td class="whitespace-nowrap px-4 py-3 text-slate-700">{{ formatarDataHora(reposicao.repostoEm) }}</td>
-                <td class="px-4 py-3 font-medium text-slate-800">{{ reposicao.lojaNome }}</td>
-                <td class="px-4 py-3 text-slate-700">{{ reposicao.autorNome }}</td>
-                <td class="px-4 py-3 text-slate-600">{{ resumoDosItens(reposicao) }}</td>
-                <td class="px-4 py-3 text-right text-slate-800">{{ reposicao.totalUnidades }}</td>
+                <td class="whitespace-nowrap px-4 py-3 text-slate-700 dark:text-slate-300">{{ formatarDataHora(reposicao.repostoEm) }}</td>
+                <td class="px-4 py-3 font-medium text-slate-800 dark:text-slate-200">{{ reposicao.lojaNome }}</td>
+                <td class="px-4 py-3 text-slate-700 dark:text-slate-300">{{ reposicao.autorNome }}</td>
+                <td class="px-4 py-3 text-slate-600 dark:text-slate-400">{{ resumoDosItens(reposicao) }}</td>
+                <td class="px-4 py-3 text-right text-slate-800 dark:text-slate-200">{{ reposicao.totalUnidades }}</td>
                 <td class="px-4 py-3 text-right">
                   @if (reposicao.podeEditar) {
                     <a [routerLink]="['/painel/reposicoes', reposicao.marcaId, reposicao.id]" class="link-discreto">Editar</a>
@@ -151,12 +151,12 @@
       @if (relatorio.totalPaginas > 1) {
         <nav class="mt-4 flex items-center justify-between gap-3" aria-label="Paginação">
           <button type="button" class="botao-secundario" [disabled]="carregando() || relatorio.pagina === 0" (click)="paginaAnterior()">Anterior</button>
-          <span class="text-sm text-slate-600" data-testid="pagina-atual">Página {{ relatorio.pagina + 1 }} de {{ relatorio.totalPaginas }}</span>
+          <span class="text-sm text-slate-600 dark:text-slate-400" data-testid="pagina-atual">Página {{ relatorio.pagina + 1 }} de {{ relatorio.totalPaginas }}</span>
           <button type="button" class="botao-secundario" [disabled]="carregando() || relatorio.pagina + 1 >= relatorio.totalPaginas" (click)="proximaPagina()">Próxima</button>
         </nav>
       }
     }
   } @else if (carregando() || carregandoContexto()) {
-    <p class="mt-6 text-slate-500" role="status">Carregando...</p>
+    <p class="mt-6 text-slate-500 dark:text-slate-400" role="status">Carregando...</p>
   }
 }

@@ -60,7 +60,7 @@ describe('PainelLayoutComponent', () => {
   const elemento = (): HTMLElement => fixture.nativeElement as HTMLElement;
 
   function botaoSair(): HTMLButtonElement {
-    return elemento().querySelector<HTMLButtonElement>('header button')!;
+    return Array.from(elemento().querySelectorAll<HTMLButtonElement>('header button')).find((b) => b.textContent?.trim().startsWith('Sair') || b.textContent?.trim().startsWith('Saindo'))!;
   }
 
   it('mostra o nome do usuário logado', () => {
