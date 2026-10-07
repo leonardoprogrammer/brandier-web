@@ -81,6 +81,7 @@ describe('authInterceptor', () => {
 
   [
     '/api/v1/usuario/login',
+    '/api/v1/usuario/entrar-google',
     '/api/v1/usuario/logout',
     '/api/v1/usuario/refresh-token',
     '/api/v1/usuario',

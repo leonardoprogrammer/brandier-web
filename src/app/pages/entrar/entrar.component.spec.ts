@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, convertToParamMap, provideRouter } from '@angular/router';
 import { Subject, of, throwError } from 'rxjs';
 
+import { CLIENT_ID_DO_GOOGLE } from '../../core/google-auth';
 import { Usuario } from '../../models/usuario.model';
 import { AuthService } from '../../services/auth.service';
 import { EntrarComponent } from './entrar.component';
@@ -12,13 +13,13 @@ describe('EntrarComponent', () => {
   let auth: jasmine.SpyObj<AuthService>;
   let router: Router;
 
-  const usuario: Usuario = { id: '1', nome: 'Pessoa Teste', email: 'pessoa@exemplo.com' };
+  const usuario: Usuario = { id: '1', nome: 'Pessoa Teste', email: 'pessoa@exemplo.com', temSenha: true, termosAceitos: true };
 
   beforeEach(async () => {
-    auth = jasmine.createSpyObj<AuthService>('AuthService', ['entrar', 'reenviarVerificacao']);
+    auth = jasmine.createSpyObj<AuthService>('AuthService', ['entrar', 'reenviarVerificacao', 'entrarComGoogle']);
     await TestBed.configureTestingModule({
       imports: [EntrarComponent],
-      providers: [provideRouter([]), { provide: AuthService, useValue: auth }],
+      providers: [provideRouter([]), { provide: AuthService, useValue: auth }, { provide: CLIENT_ID_DO_GOOGLE, useValue: '' }],
     }).compileComponents();
 
     router = TestBed.inject(Router);
@@ -90,6 +91,15 @@ describe('EntrarComponent', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/painel']);
   });
 
+  it('entra e vai para aceitar os termos quando a conta ainda não aceitou', () => {
+    auth.entrar.and.returnValue(of({ ...usuario, termosAceitos: false }));
+    preencher('pessoa@exemplo.com', 'Senha1234');
+
+    enviar();
+
+    expect(router.navigate).toHaveBeenCalledWith(['/aceitar-termos']);
+  });
+
   it('mostra mensagem de credenciais incorretas', () => {
     auth.entrar.and.returnValue(throwError(() => erroHttp(401, { codigo: 'NAO_AUTENTICADO' })));
     preencher('pessoa@exemplo.com', 'errada');
@@ -135,6 +145,37 @@ describe('EntrarComponent', () => {
     fixture.detectChanges();
 
     expect(campo.type).toBe('text');
+  });
+
+  it('mostra orientação para entrar com o Google quando a conta não tem senha definida', () => {
+    auth.entrar.and.returnValue(throwError(() => erroHttp(403, { codigo: 'SENHA_NAO_DEFINIDA' })));
+    preencher('pessoa@exemplo.com', 'qualquer-coisa');
+
+    enviar();
+
+    expect(elemento().querySelector('[data-testid="senha-nao-definida"]')?.textContent).toContain('ainda não definiu sua senha');
+    expect(router.navigate).not.toHaveBeenCalled();
+  });
+
+  it('sem chave do Google configurada não mostra o botão de entrar com o Google', () => {
+    expect(elemento().querySelector('app-google-button')).toBeNull();
+  });
+
+  it('entrarComGoogle chama o serviço e vai para o painel quando os termos já foram aceitos', () => {
+    auth.entrarComGoogle.and.returnValue(of(usuario));
+
+    (fixture.componentInstance as unknown as { entrarComGoogle(credential: string): void }).entrarComGoogle('credencial-do-google');
+
+    expect(auth.entrarComGoogle).toHaveBeenCalledWith('credencial-do-google');
+    expect(router.navigate).toHaveBeenCalledWith(['/painel']);
+  });
+
+  it('entrarComGoogle vai para aceitar os termos quando a conta é nova', () => {
+    auth.entrarComGoogle.and.returnValue(of({ ...usuario, termosAceitos: false }));
+
+    (fixture.componentInstance as unknown as { entrarComGoogle(credential: string): void }).entrarComGoogle('credencial-do-google');
+
+    expect(router.navigate).toHaveBeenCalledWith(['/aceitar-termos']);
   });
 
   it('desabilita o botão e mostra o progresso enquanto envia', () => {
@@ -199,5 +240,23 @@ describe('EntrarComponent com avisos pela URL', () => {
     expect(tela.querySelector('[data-testid="conta-excluida"]')).toBeNull();
     expect(tela.querySelector('[data-testid="senha-alterada"]')).toBeNull();
     expect(tela.textContent).not.toContain('Sua sessão expirou');
+  });
+});
+
+describe('EntrarComponent com o login do Google configurado', () => {
+  it('mostra o botão de entrar com o Google', async () => {
+    const auth = jasmine.createSpyObj<AuthService>('AuthService', ['entrar', 'reenviarVerificacao', 'entrarComGoogle']);
+    await TestBed.configureTestingModule({
+      imports: [EntrarComponent],
+      providers: [
+        provideRouter([]),
+        { provide: AuthService, useValue: auth },
+        { provide: CLIENT_ID_DO_GOOGLE, useValue: 'client-id-de-teste' },
+      ],
+    }).compileComponents();
+    const fixture = TestBed.createComponent(EntrarComponent);
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).querySelector('app-google-button')).not.toBeNull();
   });
 });

@@ -6,7 +6,7 @@ import { Usuario } from '../models/usuario.model';
 import { AuthService } from './auth.service';
 
 describe('AuthService', () => {
-  const usuario: Usuario = { id: '1', nome: 'Pessoa Teste', email: 'pessoa@exemplo.com' };
+  const usuario: Usuario = { id: '1', nome: 'Pessoa Teste', email: 'pessoa@exemplo.com', temSenha: true, termosAceitos: true };
   let service: AuthService;
   let http: HttpTestingController;
 
@@ -56,6 +56,17 @@ describe('AuthService', () => {
     http.expectOne('/api/v1/usuario/login').flush({ codigo: 'NAO_AUTENTICADO' }, { status: 401, statusText: 'x' });
 
     expect(service.autenticado()).toBeFalse();
+  });
+
+  it('entrarComGoogle envia a credencial e guarda o usuário', () => {
+    service.entrarComGoogle('credencial-do-google').subscribe();
+
+    const requisicao = http.expectOne('/api/v1/usuario/entrar-google');
+    expect(requisicao.request.method).toBe('POST');
+    expect(requisicao.request.body).toEqual({ credential: 'credencial-do-google' });
+    requisicao.flush(usuario);
+
+    expect(service.usuario()).toEqual(usuario);
   });
 
   it('cadastrar faz POST na raiz de /usuario', () => {
@@ -147,9 +158,9 @@ describe('AuthService', () => {
     const requisicao = http.expectOne('/api/v1/usuario');
     expect(requisicao.request.method).toBe('PUT');
     expect(requisicao.request.body).toEqual({ nome: 'Novo Nome' });
-    requisicao.flush({ id: '1', nome: 'Novo Nome', email: 'pessoa@exemplo.com' });
+    requisicao.flush({ id: '1', nome: 'Novo Nome', email: 'pessoa@exemplo.com', temSenha: true, termosAceitos: true });
 
-    expect(service.usuario()).toEqual({ id: '1', nome: 'Novo Nome', email: 'pessoa@exemplo.com' });
+    expect(service.usuario()).toEqual({ id: '1', nome: 'Novo Nome', email: 'pessoa@exemplo.com', temSenha: true, termosAceitos: true });
   });
 
   it('alterarSenha envia a senha atual e a nova e encerra a sessão local', () => {

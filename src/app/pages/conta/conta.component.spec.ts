@@ -16,7 +16,7 @@ describe('ContaComponent', () => {
   beforeEach(async () => {
     auth = jasmine.createSpyObj<AuthService>('AuthService', ['excluirConta', 'atualizarNome', 'alterarSenha']);
     Object.defineProperty(auth, 'usuario', {
-      value: signal<Usuario | null>({ id: '1', nome: 'Pessoa Teste', email: 'pessoa@exemplo.com' }).asReadonly(),
+      value: signal<Usuario | null>({ id: '1', nome: 'Pessoa Teste', email: 'pessoa@exemplo.com', temSenha: true, termosAceitos: true }).asReadonly(),
     });
     await TestBed.configureTestingModule({
       imports: [ContaComponent],
@@ -33,7 +33,15 @@ describe('ContaComponent', () => {
   const botao = (rotulo: string): HTMLButtonElement =>
     Array.from(elemento().querySelectorAll('button')).find((b) => b.textContent?.trim() === rotulo)!;
 
+  function abrirSecaoExclusao(): void {
+    botao('Exclusão de conta').click();
+    fixture.detectChanges();
+  }
+
   function abrirConfirmacao(): void {
+    if (!elemento().querySelector('#conteudo-exclusao')) {
+      abrirSecaoExclusao();
+    }
     botao('Excluir minha conta').click();
     fixture.detectChanges();
   }
@@ -69,17 +77,29 @@ describe('ContaComponent', () => {
     expect(elemento().querySelector('[data-testid="email"]')?.textContent).toContain('pessoa@exemplo.com');
   });
 
-  it('explica o que a exclusão apaga, inclusive as marcas e que não dá para desfazer', () => {
+  it('começa com a seção de exclusão fechada, sem mostrar a explicação nem o botão', () => {
+    expect(elemento().textContent).not.toContain('Esta ação é irreversível.');
+    expect(botao('Excluir minha conta')).toBeUndefined();
+    expect(elemento().querySelector('form')).toBeNull();
+    expect(elemento().querySelector('#senha-exclusao')).toBeNull();
+  });
+
+  it('ao clicar em "Exclusão de conta" explica o que a exclusão apaga, inclusive as marcas, e que não dá para desfazer', () => {
+    abrirSecaoExclusao();
     const texto = elemento().textContent ?? '';
 
     expect(texto).toContain('marcas que você gerencia');
     expect(texto).toContain('reposições que você registrou');
     expect(texto).toContain('Esta ação é irreversível.');
+    expect(botao('Excluir minha conta')).toBeDefined();
+    expect(elemento().querySelector('#senha-exclusao')).toBeNull();
   });
 
-  it('começa só com o botão de excluir, sem pedir a senha', () => {
-    expect(elemento().querySelector('form')).toBeNull();
-    expect(elemento().querySelector('#senha-exclusao')).toBeNull();
+  it('clicar novamente em "Exclusão de conta" fecha a seção', () => {
+    abrirSecaoExclusao();
+    abrirSecaoExclusao();
+
+    expect(elemento().textContent).not.toContain('Esta ação é irreversível.');
   });
 
   it('o botão abre a confirmação com senha e aviso de entendimento', () => {
@@ -225,7 +245,7 @@ describe('ContaComponent', () => {
     });
 
     it('salva o nome sem espaços nas pontas e fecha o formulário', () => {
-      auth.atualizarNome.and.returnValue(of({ id: '1', nome: 'Novo Nome', email: 'pessoa@exemplo.com' }));
+      auth.atualizarNome.and.returnValue(of({ id: '1', nome: 'Novo Nome', email: 'pessoa@exemplo.com', temSenha: true, termosAceitos: true }));
       abrirEdicao();
       digitar('#nome', '  Novo Nome  ');
 
@@ -373,6 +393,67 @@ describe('ContaComponent', () => {
       expect(senhaAtual.type).toBe('text');
       expect(novaSenha.type).toBe('text');
       expect(confirmar.type).toBe('text');
+    });
+  });
+
+  describe('conta sem senha definida (login só pelo Google)', () => {
+    beforeEach(async () => {
+      auth = jasmine.createSpyObj<AuthService>('AuthService', ['excluirConta', 'atualizarNome', 'alterarSenha']);
+      Object.defineProperty(auth, 'usuario', {
+        value: signal<Usuario | null>({ id: '1', nome: 'Pessoa Teste', email: 'pessoa@exemplo.com', temSenha: false, termosAceitos: true }).asReadonly(),
+      });
+      await TestBed.resetTestingModule()
+        .configureTestingModule({
+          imports: [ContaComponent],
+          providers: [provideRouter([]), { provide: AuthService, useValue: auth }],
+        })
+        .compileComponents();
+
+      router = TestBed.inject(Router);
+      spyOn(router, 'navigate').and.resolveTo(true);
+      fixture = TestBed.createComponent(ContaComponent);
+      fixture.detectChanges();
+    });
+
+    it('no formulário de senha não exibe o campo de senha atual, só explica que a conta entra pelo Google', () => {
+      botao('Definir senha').click();
+      fixture.detectChanges();
+
+      expect(elemento().querySelector('#senha-atual')).toBeNull();
+      expect(elemento().textContent).toContain('ainda não tem uma senha definida');
+    });
+
+    it('define a nova senha sem exigir a senha atual', () => {
+      auth.alterarSenha.and.returnValue(of(undefined));
+      botao('Definir senha').click();
+      fixture.detectChanges();
+      digitar('#nova-senha', 'SenhaNova12');
+      digitar('#confirmar-nova-senha', 'SenhaNova12');
+
+      enviar();
+
+      expect(auth.alterarSenha).toHaveBeenCalledOnceWith('', 'SenhaNova12');
+    });
+
+    it('na confirmação de exclusão não exibe o campo de senha', () => {
+      abrirSecaoExclusao();
+      botao('Excluir minha conta').click();
+      fixture.detectChanges();
+
+      expect(elemento().querySelector('#senha-exclusao')).toBeNull();
+    });
+
+    it('exclui a conta marcando só o entendimento, sem senha', () => {
+      auth.excluirConta.and.returnValue(of(undefined));
+      abrirSecaoExclusao();
+      botao('Excluir minha conta').click();
+      fixture.detectChanges();
+      marcarEntendimento();
+
+      enviar();
+
+      expect(auth.excluirConta).toHaveBeenCalledOnceWith('');
+      expect(router.navigate).toHaveBeenCalledWith(['/entrar'], { queryParams: { contaExcluida: true } });
     });
   });
 });

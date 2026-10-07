@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -29,7 +29,9 @@ export class ContaComponent {
   private readonly formBuilder = inject(NonNullableFormBuilder);
 
   protected readonly usuario = this.auth.usuario;
+  protected readonly temSenhaDefinida = computed(() => this.usuario()?.temSenha ?? true);
 
+  protected readonly expandirExclusao = signal(false);
   protected readonly confirmando = signal(false);
   protected readonly excluindo = signal(false);
   protected readonly erroSenha = signal<string | null>(null);
@@ -71,7 +73,13 @@ export class ContaComponent {
   );
   protected readonly novaSenhaDigitada = toSignal(this.formSenha.controls.novaSenha.valueChanges, { initialValue: '' });
 
+  protected alternarExclusao(): void {
+    this.expandirExclusao.update((aberto) => !aberto);
+  }
+
   protected abrirConfirmacao(): void {
+    this.senha.setValidators(this.temSenhaDefinida() ? [Validators.required] : []);
+    this.senha.updateValueAndValidity();
     this.confirmando.set(true);
   }
 
@@ -95,7 +103,7 @@ export class ContaComponent {
 
     this.excluindo.set(true);
     this.auth
-      .excluirConta(this.senha.value)
+      .excluirConta(this.temSenhaDefinida() ? this.senha.value : '')
       .pipe(finalize(() => this.excluindo.set(false)))
       .subscribe({
         next: () => void this.router.navigate(['/entrar'], { queryParams: { contaExcluida: true } }),
@@ -155,6 +163,9 @@ export class ContaComponent {
   }
 
   protected iniciarAlteracaoDeSenha(): void {
+    const controleSenhaAtual = this.formSenha.controls.senhaAtual;
+    controleSenhaAtual.setValidators(this.temSenhaDefinida() ? [Validators.required] : []);
+    controleSenhaAtual.updateValueAndValidity();
     this.alterandoSenha.set(true);
   }
 
@@ -181,7 +192,7 @@ export class ContaComponent {
     this.enviandoSenha.set(true);
     const { senhaAtual, novaSenha } = this.formSenha.getRawValue();
     this.auth
-      .alterarSenha(senhaAtual, novaSenha)
+      .alterarSenha(this.temSenhaDefinida() ? senhaAtual : '', novaSenha)
       .pipe(finalize(() => this.enviandoSenha.set(false)))
       .subscribe({
         next: () => void this.router.navigate(['/entrar'], { queryParams: { senhaAlterada: true } }),

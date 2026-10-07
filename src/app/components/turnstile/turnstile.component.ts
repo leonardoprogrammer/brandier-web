@@ -5,7 +5,7 @@ import { ApiDoTurnstile, TurnstileScriptService } from '../../services/turnstile
 @Component({
   selector: 'app-turnstile',
   template: `
-    <div #area aria-label="Verificação de segurança"></div>
+    <div #area class="flex justify-center" aria-label="Verificação de segurança"></div>
     @if (falhou()) {
       <p class="campo-erro" role="alert" data-testid="turnstile-erro">
         Não foi possível carregar a verificação de segurança. Recarregue a página e tente de novo.

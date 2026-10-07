@@ -73,7 +73,7 @@ describe('PainelInicioComponent', () => {
     conviteService.recebidos.and.returnValue(of({ convites: [] }));
     const auth = jasmine.createSpyObj<AuthService>('AuthService', ['sair']);
     Object.defineProperty(auth, 'usuario', {
-      value: signal<Usuario | null>({ id: '1', nome: 'Pessoa Teste', email: 'pessoa@exemplo.com' }).asReadonly(),
+      value: signal<Usuario | null>({ id: '1', nome: 'Pessoa Teste', email: 'pessoa@exemplo.com', temSenha: true, termosAceitos: true }).asReadonly(),
     });
     await TestBed.configureTestingModule({
       imports: [PainelInicioComponent],

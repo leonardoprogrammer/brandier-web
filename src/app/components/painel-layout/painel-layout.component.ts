@@ -21,7 +21,6 @@ export class PainelLayoutComponent implements OnInit {
 
   protected readonly convites = inject(ConviteService);
 
-  protected readonly usuario = this.auth.usuario;
   protected readonly saindo = signal(false);
 
   constructor() {

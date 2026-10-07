@@ -1,0 +1,41 @@
+<app-auth-layout titulo="Quase lá" subtitulo="Antes de continuar, precisamos do seu aceite dos termos.">
+  <div class="space-y-4">
+    @if (erro(); as mensagem) {
+      <p class="aviso aviso-erro" role="alert">{{ mensagem }}</p>
+    }
+
+    <p class="text-sm text-slate-700 dark:text-slate-300">
+      Olá{{ usuario()?.nome ? ', ' + usuario()?.nome : '' }}! Para usar o Brandier com a sua conta do Google, falta só
+      confirmar que você concorda com os termos do projeto.
+    </p>
+
+    <label class="flex items-start gap-3 text-sm text-slate-700 dark:text-slate-300">
+      <input
+        id="aceitou-termos"
+        type="checkbox"
+        class="mt-1 h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-600"
+        [formControl]="aceitouTermos"
+      />
+      <span>
+        Li e concordo com os termos descritos em
+        <a routerLink="/sobre" target="_blank" rel="noopener" class="link-discreto">Sobre o projeto</a>:
+        o Brandier é um projeto de portfólio, de uso não comercial, e meu nome e meu e-mail serão armazenados
+        para o funcionamento da conta.
+      </span>
+    </label>
+
+    <div class="flex flex-wrap gap-3">
+      <button
+        type="button"
+        class="botao-primario"
+        [disabled]="aceitouTermos.invalid || enviando() || saindo()"
+        (click)="prosseguir()"
+      >
+        {{ enviando() ? 'Confirmando...' : 'Prosseguir' }}
+      </button>
+      <button type="button" class="botao-secundario" [disabled]="enviando() || saindo()" (click)="sair()">
+        {{ saindo() ? 'Saindo...' : 'Sair' }}
+      </button>
+    </div>
+  </div>
+</app-auth-layout>

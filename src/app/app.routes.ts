@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { authGuard, guestGuard } from './guards/auth.guard';
+import { authGuard, guestGuard, termosGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'entrar' },
@@ -49,6 +49,13 @@ export const routes: Routes = [
     path: 'convite',
     title: 'Convite - Brandier',
     loadComponent: () => import('./pages/convite/convite.component').then((m) => m.ConviteComponent),
+  },
+  {
+    path: 'aceitar-termos',
+    title: 'Aceitar termos - Brandier',
+    canActivate: [termosGuard],
+    loadComponent: () =>
+      import('./pages/aceitar-termos/aceitar-termos.component').then((m) => m.AceitarTermosComponent),
   },
   {
     path: 'painel',

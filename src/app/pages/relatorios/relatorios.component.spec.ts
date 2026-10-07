@@ -70,7 +70,7 @@ describe('RelatoriosComponent', () => {
     lojaService = jasmine.createSpyObj<LojaService>('LojaService', ['listar']);
     produtoService = jasmine.createSpyObj<ProdutoService>('ProdutoService', ['listar']);
     const auth = jasmine.createSpyObj<AuthService>('AuthService', ['sair']);
-    Object.defineProperty(auth, 'usuario', { value: signal<Usuario | null>({ id: 'u1', nome: 'Gestora', email: 'g@exemplo.com' }).asReadonly() });
+    Object.defineProperty(auth, 'usuario', { value: signal<Usuario | null>({ id: 'u1', nome: 'Gestora', email: 'g@exemplo.com', temSenha: true, termosAceitos: true }).asReadonly() });
     marcaService.listar.and.returnValue(of(marcasGeridas));
     promotorService.meusVinculos.and.returnValue(of(semVinculos));
     promotorService.listar.and.returnValue(of(promotores));

@@ -31,6 +31,12 @@ export class AuthService {
       .pipe(tap((usuario) => this.usuarioAtual.set(usuario)));
   }
 
+  entrarComGoogle(credential: string): Observable<Usuario> {
+    return this.http
+      .post<Usuario>(`${this.baseUrl}/entrar-google`, { credential })
+      .pipe(tap((usuario) => this.usuarioAtual.set(usuario)));
+  }
+
   cadastrar(dados: NovoCadastro): Observable<MensagemResposta> {
     return this.http.post<MensagemResposta>(this.baseUrl, dados);
   }
@@ -61,6 +67,12 @@ export class AuthService {
 
   atualizarNome(nome: string): Observable<Usuario> {
     return this.http.put<Usuario>(this.baseUrl, { nome }).pipe(tap((usuario) => this.usuarioAtual.set(usuario)));
+  }
+
+  aceitarTermos(): Observable<Usuario> {
+    return this.http
+      .post<Usuario>(`${this.baseUrl}/aceitar-termos`, null)
+      .pipe(tap((usuario) => this.usuarioAtual.set(usuario)));
   }
 
   alterarSenha(senhaAtual: string, novaSenha: string): Observable<void> {

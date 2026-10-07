@@ -21,7 +21,7 @@ describe('PainelLayoutComponent', () => {
   beforeEach(async () => {
     auth = jasmine.createSpyObj<AuthService>('AuthService', ['sair']);
     Object.defineProperty(auth, 'usuario', {
-      value: signal<Usuario | null>({ id: '1', nome: 'Pessoa Teste', email: 'pessoa@exemplo.com' }).asReadonly(),
+      value: signal<Usuario | null>({ id: '1', nome: 'Pessoa Teste', email: 'pessoa@exemplo.com', temSenha: true, termosAceitos: true }).asReadonly(),
     });
     pendentes = signal(0);
     convites = jasmine.createSpyObj<ConviteService>('ConviteService', ['recebidos']);
@@ -62,10 +62,6 @@ describe('PainelLayoutComponent', () => {
   function botaoSair(): HTMLButtonElement {
     return Array.from(elemento().querySelectorAll<HTMLButtonElement>('header button')).find((b) => b.textContent?.trim().startsWith('Sair') || b.textContent?.trim().startsWith('Saindo'))!;
   }
-
-  it('mostra o nome do usuário logado', () => {
-    expect(elemento().querySelector('[data-testid="nome-usuario"]')?.textContent).toContain('Pessoa Teste');
-  });
 
   it('tem o menu com Início, Marcas, Reposições, Relatórios, Como promotor e Sobre', () => {
     const menu = elemento().querySelector('nav[aria-label="Menu do painel"]')!;
@@ -196,6 +192,17 @@ describe('PainelLayoutComponent', () => {
       expect(link.getAttribute('href')).toBe('/painel/conta');
       expect(link.textContent?.trim()).toBe('Minha conta');
       expect(link.closest('header')).not.toBeNull();
+    });
+
+    it('fica à esquerda do seletor de tema', () => {
+      const link = elemento().querySelector('[data-testid="link-conta"]')!;
+      const temaToggle = elemento().querySelector('app-tema-toggle')!;
+
+      expect(link.compareDocumentPosition(temaToggle) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    });
+
+    it('não mostra mais o nome do usuário no topo', () => {
+      expect(elemento().querySelector('[data-testid="nome-usuario"]')).toBeNull();
     });
   });
 

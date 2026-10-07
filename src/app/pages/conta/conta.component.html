@@ -58,24 +58,32 @@
   <h2 id="titulo-senha" class="text-lg font-semibold text-slate-900 dark:text-slate-100">Senha</h2>
 
   @if (!alterandoSenha()) {
-    <button type="button" class="mt-4 botao-secundario" (click)="iniciarAlteracaoDeSenha()">Alterar senha</button>
+    <button type="button" class="mt-4 botao-secundario" (click)="iniciarAlteracaoDeSenha()">
+      {{ temSenhaDefinida() ? 'Alterar senha' : 'Definir senha' }}
+    </button>
   } @else {
     <form class="mt-4 space-y-4" (submit)="alterarSenha($event)" novalidate>
-      <div>
-        <label for="senha-atual" class="campo-rotulo">Senha atual</label>
-        <input
-          id="senha-atual"
-          [type]="mostrarSenhas() ? 'text' : 'password'"
-          class="campo-entrada"
-          autocomplete="current-password"
-          [formControl]="formSenha.controls.senhaAtual"
-          [attr.aria-invalid]="mensagemDoCampoDeSenha('senhaAtual') ? 'true' : null"
-          [attr.aria-describedby]="mensagemDoCampoDeSenha('senhaAtual') ? 'senha-atual-erro' : null"
-        />
-        @if (mensagemDoCampoDeSenha('senhaAtual'); as mensagem) {
-          <p id="senha-atual-erro" class="campo-erro" role="alert">{{ mensagem }}</p>
-        }
-      </div>
+      @if (temSenhaDefinida()) {
+        <div>
+          <label for="senha-atual" class="campo-rotulo">Senha atual</label>
+          <input
+            id="senha-atual"
+            [type]="mostrarSenhas() ? 'text' : 'password'"
+            class="campo-entrada"
+            autocomplete="current-password"
+            [formControl]="formSenha.controls.senhaAtual"
+            [attr.aria-invalid]="mensagemDoCampoDeSenha('senhaAtual') ? 'true' : null"
+            [attr.aria-describedby]="mensagemDoCampoDeSenha('senhaAtual') ? 'senha-atual-erro' : null"
+          />
+          @if (mensagemDoCampoDeSenha('senhaAtual'); as mensagem) {
+            <p id="senha-atual-erro" class="campo-erro" role="alert">{{ mensagem }}</p>
+          }
+        </div>
+      } @else {
+        <p class="text-sm text-slate-600 dark:text-slate-400">
+          Sua conta ainda não tem uma senha definida (você entra pelo Google). Defina uma senha abaixo para também poder entrar com e-mail e senha.
+        </p>
+      }
 
       <div>
         <label for="nova-senha" class="campo-rotulo">Nova senha</label>
@@ -127,7 +135,11 @@
           class="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
           [disabled]="enviandoSenha()"
         >
-          {{ enviandoSenha() ? 'Alterando...' : 'Alterar senha' }}
+          @if (enviandoSenha()) {
+            {{ temSenhaDefinida() ? 'Alterando...' : 'Definindo...' }}
+          } @else {
+            {{ temSenhaDefinida() ? 'Alterar senha' : 'Definir senha' }}
+          }
         </button>
         <button type="button" class="botao-secundario" [disabled]="enviandoSenha()" (click)="cancelarAlteracaoDeSenha()">Cancelar</button>
       </div>
@@ -136,64 +148,92 @@
 </section>
 
 <section class="mt-6 rounded-2xl border border-red-200 dark:border-red-900/50 bg-white dark:bg-slate-900 p-6" aria-labelledby="titulo-exclusao">
-  <h2 id="titulo-exclusao" class="text-lg font-semibold text-red-800 dark:text-red-300">Excluir conta</h2>
-  <p class="mt-2 text-sm text-slate-700 dark:text-slate-300">
-    Ao excluir a conta:
-  </p>
-  <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700 dark:text-slate-300">
-    <li>seu e-mail e sua senha são apagados: você não poderá mais entrar (seu nome continua aparecendo nas reposições já registradas, para o controle dos gestores);</li>
-    <li>as <strong>marcas que você gerencia</strong> são apagadas com as lojas, os produtos, os promotores e os convites — a menos que já tenham reposições registradas, caso em que ficam inativas (sem novos convites, produtos ou reposições) para preservar o histórico de quem promoveu nelas;</li>
-    <li>as reposições que você registrou como promotor em marcas de outros gestores são mantidas, para não afetar os relatórios desses gestores; só o seu vínculo de promotor é removido;</li>
-    <li>os convites pendentes enviados para o seu e-mail são cancelados.</li>
-  </ul>
-  <p class="mt-2 text-sm font-medium text-red-800 dark:text-red-300">Esta ação é irreversível.</p>
+  <button
+    type="button"
+    class="flex w-full items-center justify-between gap-2 text-left"
+    [attr.aria-expanded]="expandirExclusao()"
+    aria-controls="conteudo-exclusao"
+    (click)="alternarExclusao()"
+  >
+    <h2 id="titulo-exclusao" class="text-lg font-semibold text-red-800 dark:text-red-300">Exclusão de conta</h2>
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="h-5 w-5 shrink-0 text-red-800 transition-transform dark:text-red-300"
+      [class.rotate-180]="expandirExclusao()"
+      aria-hidden="true"
+    >
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  </button>
 
-  @if (!confirmando()) {
-    <button type="button" class="mt-4 inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2" (click)="abrirConfirmacao()">
-      Excluir minha conta
-    </button>
-  } @else {
-    <form class="mt-4 space-y-4 rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/40 p-4" (submit)="excluir($event)" novalidate role="alertdialog" aria-label="Confirmar exclusão da conta">
-      <div>
-        <label for="senha-exclusao" class="campo-rotulo">Digite sua senha para confirmar</label>
-        <input
-          id="senha-exclusao"
-          type="password"
-          class="campo-entrada"
-          autocomplete="current-password"
-          [formControl]="senha"
-          [attr.aria-invalid]="mensagemDaSenha() ? 'true' : null"
-          [attr.aria-describedby]="mensagemDaSenha() ? 'senha-exclusao-erro' : null"
-        />
-        @if (mensagemDaSenha(); as mensagem) {
-          <p id="senha-exclusao-erro" class="campo-erro" role="alert">{{ mensagem }}</p>
-        }
-      </div>
+  @if (expandirExclusao()) {
+    <div id="conteudo-exclusao" class="mt-4">
+      <p class="text-sm text-slate-700 dark:text-slate-300">
+        Ao excluir a conta:
+      </p>
+      <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700 dark:text-slate-300">
+        <li>seu e-mail e sua senha são apagados: você não poderá mais entrar (seu nome continua aparecendo nas reposições já registradas, para o controle dos gestores);</li>
+        <li>as <strong>marcas que você gerencia</strong> são apagadas com as lojas, os produtos, os promotores e os convites — a menos que já tenham reposições registradas, caso em que ficam inativas (sem novos convites, produtos ou reposições) para preservar o histórico de quem promoveu nelas;</li>
+        <li>as reposições que você registrou como promotor em marcas de outros gestores são mantidas, para não afetar os relatórios desses gestores; só o seu vínculo de promotor é removido;</li>
+        <li>os convites pendentes enviados para o seu e-mail são cancelados.</li>
+      </ul>
+      <p class="mt-2 text-sm font-medium text-red-800 dark:text-red-300">Esta ação é irreversível.</p>
 
-      <div>
-        <label class="flex items-start gap-2 text-sm text-slate-800 dark:text-slate-200">
-          <input type="checkbox" class="mt-1 h-4 w-4 rounded border-slate-300 dark:border-slate-600" [formControl]="entendi" />
-          <span>Entendo que a exclusão é definitiva e não há como desfazer.</span>
-        </label>
-        @if (mensagemDoAviso(); as mensagem) {
-          <p class="campo-erro" role="alert">{{ mensagem }}</p>
-        }
-      </div>
-
-      @if (erro(); as mensagem) {
-        <p class="aviso aviso-erro" role="alert">{{ mensagem }}</p>
-      }
-
-      <div class="flex flex-wrap gap-3">
-        <button
-          type="submit"
-          class="inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-          [disabled]="excluindo()"
-        >
-          {{ excluindo() ? 'Excluindo...' : 'Excluir definitivamente' }}
+      @if (!confirmando()) {
+        <button type="button" class="mt-4 inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2" (click)="abrirConfirmacao()">
+          Excluir minha conta
         </button>
-        <button type="button" class="botao-secundario" [disabled]="excluindo()" (click)="cancelar()">Cancelar</button>
-      </div>
-    </form>
+      } @else {
+        <form class="mt-4 space-y-4 rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/40 p-4" (submit)="excluir($event)" novalidate role="alertdialog" aria-label="Confirmar exclusão da conta">
+          @if (temSenhaDefinida()) {
+            <div>
+              <label for="senha-exclusao" class="campo-rotulo">Digite sua senha para confirmar</label>
+              <input
+                id="senha-exclusao"
+                type="password"
+                class="campo-entrada"
+                autocomplete="current-password"
+                [formControl]="senha"
+                [attr.aria-invalid]="mensagemDaSenha() ? 'true' : null"
+                [attr.aria-describedby]="mensagemDaSenha() ? 'senha-exclusao-erro' : null"
+              />
+              @if (mensagemDaSenha(); as mensagem) {
+                <p id="senha-exclusao-erro" class="campo-erro" role="alert">{{ mensagem }}</p>
+              }
+            </div>
+          }
+
+          <div>
+            <label class="flex items-start gap-2 text-sm text-slate-800 dark:text-slate-200">
+              <input type="checkbox" class="mt-1 h-4 w-4 rounded border-slate-300 dark:border-slate-600" [formControl]="entendi" />
+              <span>Entendo que a exclusão é definitiva e não há como desfazer.</span>
+            </label>
+            @if (mensagemDoAviso(); as mensagem) {
+              <p class="campo-erro" role="alert">{{ mensagem }}</p>
+            }
+          </div>
+
+          @if (erro(); as mensagem) {
+            <p class="aviso aviso-erro" role="alert">{{ mensagem }}</p>
+          }
+
+          <div class="flex flex-wrap gap-3">
+            <button
+              type="submit"
+              class="inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+              [disabled]="excluindo()"
+            >
+              {{ excluindo() ? 'Excluindo...' : 'Excluir definitivamente' }}
+            </button>
+            <button type="button" class="botao-secundario" [disabled]="excluindo()" (click)="cancelar()">Cancelar</button>
+          </div>
+        </form>
+      }
+    </div>
   }
 </section>

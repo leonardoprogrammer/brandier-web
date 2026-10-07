@@ -9,7 +9,11 @@ export const authGuard: CanActivateFn = () => {
     return true;
   }
   const router = inject(Router);
-  return inject(AuthService).autenticado() ? true : router.createUrlTree(['/entrar']);
+  const auth = inject(AuthService);
+  if (!auth.autenticado()) {
+    return router.createUrlTree(['/entrar']);
+  }
+  return auth.usuario()?.termosAceitos === false ? router.createUrlTree(['/aceitar-termos']) : true;
 };
 
 export const guestGuard: CanActivateFn = () => {
@@ -18,4 +22,16 @@ export const guestGuard: CanActivateFn = () => {
   }
   const router = inject(Router);
   return inject(AuthService).autenticado() ? router.createUrlTree(['/painel']) : true;
+};
+
+export const termosGuard: CanActivateFn = () => {
+  if (!isPlatformBrowser(inject(PLATFORM_ID))) {
+    return true;
+  }
+  const router = inject(Router);
+  const auth = inject(AuthService);
+  if (!auth.autenticado()) {
+    return router.createUrlTree(['/entrar']);
+  }
+  return auth.usuario()?.termosAceitos === false ? true : router.createUrlTree(['/painel']);
 };

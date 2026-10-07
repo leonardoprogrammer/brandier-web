@@ -31,6 +31,13 @@
       </div>
     }
 
+    @if (senhaNaoDefinida()) {
+      <p class="aviso aviso-atencao" role="alert" data-testid="senha-nao-definida">
+        Parece que você ainda não definiu sua senha. Entre com o Google ou solicite em
+        <a routerLink="/esqueci-senha" class="link-discreto">Esqueci minha senha</a>.
+      </p>
+    }
+
     <div>
       <label for="email" class="campo-rotulo">E-mail</label>
       <input
@@ -82,6 +89,22 @@
       {{ enviando() ? 'Entrando...' : 'Entrar' }}
     </button>
   </form>
+
+  @if (googleAtivo) {
+    <div class="mt-6">
+      <div class="relative">
+        <div class="absolute inset-0 flex items-center">
+          <div class="w-full border-t border-slate-200 dark:border-slate-700"></div>
+        </div>
+        <div class="relative flex justify-center text-sm">
+          <span class="bg-white dark:bg-slate-900 px-2 text-slate-500 dark:text-slate-400">ou</span>
+        </div>
+      </div>
+      <div class="mt-4 flex justify-center" [class.pointer-events-none]="enviandoGoogle()" [class.opacity-60]="enviandoGoogle()">
+        <app-google-button [clientId]="clienteGoogle" (credential)="entrarComGoogle($event)" />
+      </div>
+    </div>
+  }
 
   <p class="mt-6 text-center text-sm text-slate-600 dark:text-slate-400">
     Ainda não tem conta?

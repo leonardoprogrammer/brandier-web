@@ -7,6 +7,7 @@ import { AuthService } from '../services/auth.service';
 
 const ROTAS_SEM_RENOVACAO = [
   '/usuario/login',
+  '/usuario/entrar-google',
   '/usuario/refresh-token',
   '/usuario/logout',
   '/usuario',

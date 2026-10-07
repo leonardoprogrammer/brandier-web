@@ -2,6 +2,8 @@ export interface Usuario {
   id: string;
   nome: string;
   email: string;
+  temSenha: boolean;
+  termosAceitos: boolean;
 }
 
 export interface NovoCadastro {
