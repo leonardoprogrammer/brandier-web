@@ -1,0 +1,35 @@
+<app-public-layout>
+  <article class="space-y-12">
+    <header>
+      <h1 class="text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Brandier</h1>
+      <p class="mt-4 text-lg text-slate-600 dark:text-slate-400">
+        Gestão de promotores de marca: cadastre lojas e produtos, convide promotores e acompanhe as reposições
+        registradas nos pontos de venda, com painéis e relatórios completos.
+      </p>
+      <div class="mt-6 flex flex-wrap gap-3">
+        <a routerLink="/cadastro" class="botao-primario w-auto">Criar conta</a>
+        <a routerLink="/entrar" class="botao-secundario w-auto">Entrar</a>
+      </div>
+    </header>
+
+    <section aria-labelledby="funcionalidades">
+      <h2 id="funcionalidades" class="text-xl font-semibold text-slate-900 dark:text-slate-100">O que você pode fazer</h2>
+      <ul class="mt-4 grid gap-4 sm:grid-cols-2" data-testid="funcionalidades">
+        @for (item of funcionalidades; track item.titulo) {
+          <li class="rounded-lg bg-slate-50 dark:bg-slate-800 px-4 py-3">
+            <h3 class="font-semibold text-slate-900 dark:text-slate-100">{{ item.titulo }}</h3>
+            <p class="mt-1 text-sm text-slate-700 dark:text-slate-300">{{ item.descricao }}</p>
+          </li>
+        }
+      </ul>
+    </section>
+
+    <section aria-labelledby="saiba-mais">
+      <h2 id="saiba-mais" class="text-xl font-semibold text-slate-900 dark:text-slate-100">Quer saber mais?</h2>
+      <p class="mt-3 text-slate-700 dark:text-slate-300">
+        Veja o passo a passo completo em <a routerLink="/como-funciona" class="link-discreto">Como funciona</a> ou
+        conheça o projeto em <a routerLink="/sobre" class="link-discreto">Sobre o projeto</a>.
+      </p>
+    </section>
+  </article>
+</app-public-layout>

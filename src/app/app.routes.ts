@@ -3,7 +3,13 @@ import { Routes } from '@angular/router';
 import { authGuard, guestGuard, termosGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: 'entrar' },
+  {
+    path: '',
+    pathMatch: 'full',
+    title: 'Brandier - Gestão de promotores de marca',
+    canActivate: [guestGuard],
+    loadComponent: () => import('./pages/inicio/inicio.component').then((m) => m.InicioComponent),
+  },
   {
     path: 'entrar',
     title: 'Entrar - Brandier',
@@ -188,5 +194,5 @@ export const routes: Routes = [
       },
     ],
   },
-  { path: '**', redirectTo: 'entrar' },
+  { path: '**', redirectTo: '' },
 ];
